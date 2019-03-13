@@ -1,8 +1,10 @@
 <template>
 <div>
     <li class="slide-item has-children" v-for="node in data" :key='node.index'>
-        <span class="icon"></span>
-        <span class="item-text">{{node.name}}</span>
+        <div class="slide-item-sub">
+            <span class="icon"></span>
+            <span class="item-text">{{node.name}}</span>
+        </div>
         <ul class="slide-ul">
             <TreeNode
                 :data="node.children"

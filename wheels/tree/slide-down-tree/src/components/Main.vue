@@ -6,7 +6,9 @@
         </div>
         <div class="slide-ctn">
           <Search/>
-          <Tree :data="initData"/>
+          <div class="sub-slide-ctn">
+            <Tree :data="initData"/>
+          </div>
           <ul class="slide-ul" style="display:none">
               <li class="slide-item">
                   <span class="icon"></span>
@@ -116,10 +118,10 @@ export default {
                 margin-left: 10px;
             }
         }
-        .slide-ctn>.slide-ul::before{
+        .sub-slide-ctn>.slide-ul::before{
           opacity: 0;
         }
-        .slide-ctn>.slide-ul>div>.slide-item::before{
+        .sub-slide-ctn>.slide-ul>div>.slide-item::before{
           opacity: 0;
         }
         .slide-ctn{
@@ -137,47 +139,52 @@ export default {
             box-shadow: 0 4px 8px 0 rgba(41,42,45,.28);
             z-index: 9;
             max-height: 365px;
-            overflow-y: auto;
             padding: 0;
+            overflow: hidden;
 
-            /*滚动条样式*/
-            &::-webkit-scrollbar {
-                width: 3px;
-                height: 3px;
-            }
-            &::-webkit-scrollbar-thumb {
-                border-radius: 5px;
-                background: #d8d8d8;
+            .sub-slide-ctn{
+                overflow-x: hidden;
+                overflow-y: auto;
+                /*滚动条样式*/
+                &::-webkit-scrollbar {
+                    width: 3px;
+                    height: 3px;
+                }
+                &::-webkit-scrollbar-thumb {
+                    border-radius: 5px;
+                    background: #d8d8d8;
+                }
             }
             .slide-ul{
               position: relative;
 
-              // &::before{
-              //   content: '';
-              //   display: inline-block;
-              //   position: absolute;
-              //   width: 1px;
-              //   bottom: 17px;
-              //   top: 0;
-              //   background: rgba(208,208,208,1);
-              // }
               .slide-item:nth-of-type(1)::after {
                 top: 0;
                 height: 16px;
               }
               .slide-item{
-                width: 300px;
+                width: 100%;
                 line-height: 33px;
+                height: 33px;
                 position: relative;
                 padding-left: 40px;
                 font-size: 12px;
-
-                .item-text{
-                  display: inline-block;
-                  width: 100%;
+                .slide-item-sub{
+                    height: 33px;
                 }
-                .item-text:hover{
-                  background:rgba(243,243,243,1);
+                .item-text{
+                    display: inline-block;
+                    max-width: 200px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    vertical-align: top;
+                }
+                .slide-item-sub{
+                    cursor: pointer;
+                    &:hover{
+                    background:rgba(243,243,243,1);
+                    }
                 }
                 &::before{
                   content: '';
@@ -188,7 +195,7 @@ export default {
                   left: 0px;
                   top: 16px;
                   background: #d0d0d0;
-                }  
+                }
                 &::after{
                   content: '';
                   display: inline-block;
