@@ -1,36 +1,77 @@
 <template>
   <div id="app">
-      <div class="file-tree-select">
+      <div class="ys-file-tree-select">
         <div class="select-head">
             <span class="select-result">选择</span>    
         </div>
-        <ul class="slide-ctn">
-            <li class="slide-item">
-                <span class="icon">+</span>
-                <span class="item-text">全局</span>
-            </li>
-            <li class="slide-item">
-                <span class="icon">+</span>
-                <span class="item-text">全局1</span>
-            </li>
-            <li class="slide-item">
-                <span class="icon">+</span>
-                <span class="item-text">全局2</span>
-            </li>
-        </ul>
+        <div class="slide-ctn">
+          <Search/>
+          <Tree :data="initData"/>
+          <ul class="slide-ul" style="display:none">
+              <li class="slide-item">
+                  <span class="icon"></span>
+                  <span class="item-text">全局</span>
+                  <ul class="slide-ul">
+                      <li class="slide-item">
+                          <span class="icon"></span>
+                          <span class="item-text">撒打算大</span>
+                      </li>
+                      <li class="slide-item">
+                          <span class="icon"></span>
+                          <span class="item-text">啛啛喳喳</span>
+                      </li>
+                      <li class="slide-item">
+                          <span class="icon"></span>
+                          <span class="item-text">打断点</span>
+                          <ul class="slide-ul">
+                      <li class="slide-item">
+                          <span class="icon"></span>
+                          <span class="item-text">撒打算大</span>
+                      </li>
+                      <li class="slide-item">
+                          <span class="icon"></span>
+                          <span class="item-text">啛啛喳喳</span>
+                      </li>
+                      <li class="slide-item">
+                          <span class="icon"></span>
+                          <span class="item-text">打断点</span>
+                      </li>
+                  </ul>
+                      </li>
+                  </ul>
+              </li>
+              <li class="slide-item has-children">
+                  <span class="icon"></span>
+                  <span class="item-text">全局1</span>
+              </li>
+              <li class="slide-item has-children">
+                  <span class="icon"></span>
+                  <span class="item-text">全局2</span>
+              </li>
+          </ul>
+        </div>
       </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import Search from './Serach'
+import Tree from './tree/Tree'
+
 export default {
-  name: 'app',1
+  name: 'app',
   data () {
     return {
-    //   msg: 'Welcome to Your Vue.js App'
+      initData: [
+        {name: '111'}, {name: '222'}, {name: '333'}, {name: '444', children: [{name:'ssdasdasd'}, {name: 'sssss', children: [{name: '萨达大萨达女', children: [{name: '吧吧不成熟时'}]}]}]}
+      ]
     }
-  }, 
+  },
+  components: {
+    Search,
+    Tree
+  },
   created () {
       // 允许跨域携带cookie
       axios.defaults.withCredentials = true
@@ -39,21 +80,21 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     ul, li{
         list-style: none;
         padding: 0;
         margin: 0;
     }
-    .file-tree-select{
+    .ys-file-tree-select{
         min-width: 130px;
         max-width: 200px;
         text-align: left;
         position: relative;
-        &:hover .slide-ctn{
-            opacity: 1;
-            height: 20px;
-        }
+        // &:hover .slide-ctn{
+        //     opacity: 1;
+        //     height: 20px;
+        // }
 
         .select-head{
             margin-right: 10px;
@@ -75,166 +116,127 @@ export default {
                 margin-left: 10px;
             }
         }
+        .slide-ctn>.slide-ul::before{
+          opacity: 0;
+        }
+        .slide-ctn>.slide-ul>div>.slide-item::before{
+          opacity: 0;
+        }
         .slide-ctn{
-            opacity: 0;
-            height: 0;
+            padding-bottom: 10px;
+            opacity: 1;
+            // height: 0;
             -webkit-transition: height 200ms ease-in;
             -moz-transition: height 200ms ease-in;
             -o-transition: height 200ms ease-in;
             transition: height 200ms ease-in;
             font-size: 12px;
             position: absolute;
-            width: 459px;
+            width: 400px;
             background: #fff;
-            padding: 4px 20px;
             box-shadow: 0 4px 8px 0 rgba(41,42,45,.28);
             z-index: 9;
-            padding-left: 10px;
             max-height: 365px;
             overflow-y: auto;
+            padding: 0;
+
             /*滚动条样式*/
-            &::-webkit-scrollbar {/*滚动条整体样式*/
-                width: 3px;     /*高宽分别对应横竖滚动条的尺寸*/
+            &::-webkit-scrollbar {
+                width: 3px;
                 height: 3px;
             }
-            &::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
+            &::-webkit-scrollbar-thumb {
                 border-radius: 5px;
                 background: #d8d8d8;
             }
-            // &::-webkit-scrollbar-track {/*滚动条里面轨道*/
-            //     -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-            //     border-radius: 0;
-            //     background: rgba(0,0,0,0.1);
-            // }
+            .slide-ul{
+              position: relative;
 
-            .slide-item{
-                width: 100%;
+              // &::before{
+              //   content: '';
+              //   display: inline-block;
+              //   position: absolute;
+              //   width: 1px;
+              //   bottom: 17px;
+              //   top: 0;
+              //   background: rgba(208,208,208,1);
+              // }
+              .slide-item:nth-of-type(1)::after {
+                top: 0;
+                height: 16px;
+              }
+              .slide-item{
+                width: 300px;
                 line-height: 33px;
+                position: relative;
+                padding-left: 40px;
+                font-size: 12px;
+
+                .item-text{
+                  display: inline-block;
+                  width: 100%;
+                }
+                .item-text:hover{
+                  background:rgba(243,243,243,1);
+                }
+                &::before{
+                  content: '';
+                  display: inline-block;
+                  position: absolute;
+                  width: 13px;
+                  height: 1px;
+                  left: 0px;
+                  top: 16px;
+                  background: #d0d0d0;
+                }  
+                &::after{
+                  content: '';
+                  display: inline-block;
+                  position: absolute;
+                  width: 1px;
+                  height: 34px;
+                  left: 0px;
+                  top: -17px;
+                  background: #d0d0d0;
+                }  
+                .icon{
+                  cursor: pointer;
+                  position: absolute;
+                  display: inline-block;
+                  left: 19px;
+                  top: 11px;
+                  width: 10px;
+                  height: 10px;
+                  border-radius: 2px;
+                  border: 1px solid #555555;
+                  transform: translateY(-15%);
+                }
+                .icon::before{
+                  display: inline-block;
+                  content: '';
+                  position: absolute;
+                  width: 6px;
+                  height: 2px;
+                  background:rgba(85,85,85,1);
+                  left: 2px;
+                  top: 4px;
+                  transform: translate(-3%, -11%);
+                }
+                &.has-children{
+                  .icon::after{
+                    display: inline-block;
+                    content: '';
+                    position: absolute;
+                    width: 2px;
+                    height: 6px;
+                    background: #555555;
+                    left: 4px;
+                    top: 2px;
+                  }
+                }
+              }
             }
+            
         }
     }
-    /*start多级管控新下拉*/
-#initInfiniteUl {
-  display: none;
-  font-size: 12px;
-  position: absolute;
-  /*left: 200px;*/
-  /*top: 100px;*/
-  width: 459px;
-  background: white;
-  padding: 4px 20px;
-  box-shadow:0px 4px 8px 0px rgba(41,42,45,0.28);
-  z-index: 9;
-  padding-left: 10px;
-  max-height: 365px;
-  overflow-y: auto;
-}
-#initInfiniteUl::-webkit-scrollbar {
-   width: 4px;
-   height: 4px;
- }
-#initInfiniteUl::-webkit-scrollbar-thumb {
-   border-radius: 5px;
-   -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-   background: rgba(0,0,0,0.2);
- }
-#initInfiniteUl::-webkit-scrollbar-track {
-   -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
-   border-radius: 0;
-   background: rgba(0,0,0,0.1);
- }
-.initInfiniteUl .initInfiniteLi{
-  line-height: 33px;
-  /*height: 33px;*/
-  position: relative;
-}
-.initInfiniteCtn{
-  display: none;
-}
-.initInfiniteCtn>.verticalLine{
-  display: inline-block;
-  width: 1px;
-  position: absolute;
-  top: 24px;
-  background: #DEE0E3;
-  height: 0;
-}
-.initInfiniteItem {
-  padding-left: 22px;
-  position: relative;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.initInfiniteItem::before{
-  content: '';
-  display: inline-block;
-  position: absolute;
-  background: #DEE0E3;
-  width: 13px;
-  height: 1px;
-  left: 0;
-  top: 15px;
-}
-.toggleShowIcon{
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-  border: 1px solid rgba(85,85,85,1);
-  vertical-align: middle;
-  margin-top: -3px;
-  position: relative;
-  cursor: pointer;
-  margin-right: 8px;
-  position: absolute;
-  left: 14px;
-  top: 12px;
-}
-.toggleShowIcon::before{
-  content: '';
-  display: inline-block;
-  position: absolute;
-  width: 6px;
-  height: 2px;
-  background: #555555;
-  left: 2px;
-  top: 4px;
-}
-.toggleShowIcon::after{
-  content: '';
-  display: inline-block;
-  position: absolute;
-  width: 2px;
-  height: 6px;
-  background: #555555;
-  left: 4px;
-  top: 2px;
-}
-.active>.toggleShowIcon::after{
-  display: none;
-}
-.initInfiniteLi>.initInfiniteCtn{
-  display: block;
-}
-.initInfiniteCtn .active>.initInfiniteCtn{
-  display: block;
-}
-.initInfiniteUl .details{
-  cursor: pointer;
-  display: inline-block;
-  white-space: nowrap;
-  padding-left: 6px;
-}
-.initInfiniteLi>.initInfiniteCtn>.initInfiniteItem::before{
-  display: none;
-}
-.initInfiniteLi>.initInfiniteCtn>.initInfiniteItem>.toggleShowIcon{
-  position: absolute;
-  left: 0;
-  top: 12px;
-}
-.initInfiniteLi>.initInfiniteCtn>.initInfiniteItem>.details{
-  padding-left: 0;
-}
-/*end多级管控新下拉*/
 </style>
