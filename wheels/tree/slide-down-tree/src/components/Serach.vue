@@ -1,17 +1,25 @@
 <template>
   <div class="ctn">
     <img class="searchIcon" :src= searchImg>
-    <input class="input" type="text" placeholder="请输入"/>
+    <input class="input" type="text" placeholder="请输入" v-model="searchVal" @keyup.enter="searchData"/>
   </div>
 </template>
 
 <script>
 import { searchImg } from './../static/img/base64'
+import Bus from './../bus.js'
+
 export default {
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',
-      searchImg: searchImg
+      searchImg: searchImg,
+      searchVal: ''
+    }
+  },
+  methods: {
+    searchData() {
+      Bus.$emit('searchData', this.searchVal)
     }
   }
 }
@@ -41,6 +49,7 @@ export default {
         margin-left: 6px;
         font-size: 12px;
         margin-top: -1px;
+        width: 300px;
     }
 }
 </style>

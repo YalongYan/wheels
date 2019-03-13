@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <Main/>
+    <Main
+      :host="host"
+      :qzid="qzid"
+      />
   </div>
 </template>
 
@@ -10,7 +13,8 @@ export default {
   name: 'app',
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      host: "http://web.api.chaoke.com:6062",
+      qzid: "16214"
     }
   },
   components: {

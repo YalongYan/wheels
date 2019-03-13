@@ -60,24 +60,138 @@
 import axios from 'axios'
 import Search from './Serach'
 import Tree from './tree/Tree'
+import Bus from './../bus'
+import FormatRequestData from './../mixin/formatRequestData.js'
 
 export default {
   name: 'app',
   data () {
     return {
-      initData: [
-        {name: '111'}, {name: '222'}, {name: '333'}, {name: '444', children: [{name:'ssdasdasd'}, {name: 'sssss', children: [{name: '萨达大萨达女', children: [{name: '吧吧不成熟时'}]}]}]}
-      ]
+      initData: [] 
+    }
+  },
+  mixins: [FormatRequestData],
+  props:{
+    v:{
+      type: Number,  
+      default: 1
+    },
+    host: {
+      type: String,
+      default: ''
+    },
+    qzid: {
+      type: String,
+      default: ''
+    },
+    page: {
+      type: Number,
+      default: 1
+    },
+    count: {
+      type: Number,
+      default: 60
+    },
+    breadcrumbs: {
+      type: Number,
+      default: 0
+    },
+    parent_id: {
+      type: Number,
+      default: 0
+    },
+    dept_type: {
+      type: Number,
+      default: 0
+    },
+    is_org: {
+      type: Number,
+      default: 0
+    }
+  },
+  provide () {
+    return {
+      host: this.host,
+      v: this.v,
+      qzid: this.qzid,
+      page: this.page,
+      count: this.count,
+      breadcrumbs: this.breadcrumbs,
+      parent_id: this.parent_id,
+      dept_type: this.dept_type,
+      is_org: this.is_org
     }
   },
   components: {
     Search,
     Tree
   },
+  methods:{
+    addChildrenData(id, result) {
+      let data = this.initData
+      function getArray (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i].id == id) {
+            arr[i].children = result
+            arr[i].open = true
+            arr[i].hasChildren = true
+          } else {
+            getArray(arr[i].children)
+          }
+        }
+      }
+      getArray(data)
+      this.initData = data
+    },
+    searchData(val) {
+        let keyword = val
+        let url = this.host + '/dept/getDeptList?qzid=0&upesnc=null&upesntgc=null&upesnugc=null&v=1&parent_id=0&page=1&count=60&keyword='+keyword
+        this.$http.get(url).then((response) => {
+        let data = response.data.dept_list
+        if(response.code == 0) {
+            let arr = []
+            for(let i=0; i<data.length; i++) {
+                data[i].hasChildren = true
+                data[i].open = false
+                data[i].children = []
+                arr.push(data[i])
+            }
+            this.initData = arr
+        } else {
+            alert(data.msg)
+        }
+        }).catch(() => {
+
+        })
+    }
+  },
   created () {
-      // 允许跨域携带cookie
-      axios.defaults.withCredentials = true
-      axios.get('http://web.api.chaoke.com:6062/dept/getDeptList?qzid=0&sessionid=q6678tprcndl44sh1coc9gdp01&upesnc=null&upesntgc=null&upesnugc=null&v=1&parent_id=334890&page=1&count=60')
+    let getRequestPara = this.formatRequestData()
+    let url = this.host + '/dept/getDeptList?' + getRequestPara
+    this.$http.get(url).then((response) => {
+    let data = response.data.dept_list
+    if(response.code == 0) {
+        let arr = []
+        for(let i=0; i<data.length; i++) {
+            data[i].hasChildren = true
+            data[i].open = false
+            data[i].children = []
+            arr.push(data[i])
+        }
+        this.initData = arr
+    } else {
+        alert(data.msg)
+    }
+    }).catch(() => {
+
+    })
+
+    Bus.$on('searchData', (val) => {
+      this.searchData(val)
+    })
+    Bus.$on('addChildrenData', (id, result) => {
+      this.addChildrenData(id, result)
+    })
   }
 }
 </script>
@@ -145,6 +259,8 @@ export default {
             .sub-slide-ctn{
                 overflow-x: hidden;
                 overflow-y: auto;
+                height: 228px;
+
                 /*滚动条样式*/
                 &::-webkit-scrollbar {
                     width: 3px;
