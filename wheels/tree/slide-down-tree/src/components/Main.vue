@@ -25,12 +25,12 @@
 <script>
 import axios from 'axios'
 export default {
-  name: 'app',
+  name: 'app',1
   data () {
     return {
     //   msg: 'Welcome to Your Vue.js App'
     }
-  },
+  }, 
   created () {
       // 允许跨域携带cookie
       axios.defaults.withCredentials = true
