@@ -153,6 +153,7 @@ export default {
             for(let i=0; i<data.length; i++) {
                 data[i].hasChildren = true
                 data[i].open = false
+                data[i].isLoading = false
                 data[i].children = []
                 arr.push(data[i])
             }
@@ -175,6 +176,7 @@ export default {
         for(let i=0; i<data.length; i++) {
             data[i].hasChildren = true
             data[i].open = false
+            data[i].isLoading = false
             data[i].children = []
             arr.push(data[i])
         }
@@ -274,6 +276,16 @@ export default {
             .slide-ul{
               position: relative;
 
+              &::before{
+                content: '';
+                display: inline-block;
+                position: absolute;
+                width: 1px;
+                left: 0px;
+                top: 0;
+                bottom: 16px;
+                background: #d0d0d0;
+              }
               .slide-item:nth-of-type(1)::after {
                 top: 0;
                 height: 16px;
@@ -312,16 +324,16 @@ export default {
                   top: 16px;
                   background: #d0d0d0;
                 }
-                &::after{
-                  content: '';
-                  display: inline-block;
-                  position: absolute;
-                  width: 1px;
-                  height: 34px;
-                  left: 0px;
-                  top: -17px;
-                  background: #d0d0d0;
-                }  
+                // &::after{
+                //   content: '';
+                //   display: inline-block;
+                //   position: absolute;
+                //   width: 1px;
+                //   height: 34px;
+                //   left: 0px;
+                //   top: -17px;
+                //   background: #d0d0d0;
+                // }  
                 .icon{
                   cursor: pointer;
                   position: absolute;

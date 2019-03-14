@@ -4,6 +4,7 @@
         :class="{'has-children': node.hasChildren}"
         @click.stop="loadData(node)">
         <div class="slide-item-sub">
+            <Loading v-if="node.isLoading" :size="12"/>
             <span class="icon"></span>
             <span class="item-text">{{node.name}}</span>
         </div>
@@ -21,57 +22,10 @@
         </transition>
     </li>
 </div>
-    <!-- <li class="slide-item has-children"> -->
-   
-     <!-- <li class="node" v-for="node in data" :key='node.index'>
-        <div>
-            <div v-if="!node.newFile">
-                <div v-if="node.hasChildren" @click="loadItem(node)"
-                class="li-hover-item"
-                :class="{seceltedCLass: treeResult.fid == node.fid}"
-                :style="{ paddingLeft: ( node.level*20 + 17 ) + 'px' }">
-                <span :class="{'dropTogleIconRoate': node.open}" class="dropTogleIcon"></span>
-                <img class="downloadIconImg" :src='downloadImgUrl'>
-                <Loading :size='12' v-show="node.loading"/>
-                <span class="node-name">{{node.filename}}</span>
-                </div>
-                <div v-else class="li-hover-item"
-                    :class="{seceltedCLass: treeResult.fid == node.fid}"
-                    @click.stop='selectItem(node)'
-                    :style="{ paddingLeft: ( node.level*20 + 10 ) + 'px' }">
-                    <span class="empty-node-icon"></span>
-                    <img class="downloadIconImg" :src='downloadImgUrl'>
-                    <span class="node-name">{{node.filename}}</span>
-                </div>
-            </div>
-            <div v-else
-                class="li-hover-item"
-                :style="{ paddingLeft: ( node.level*20 + 10 ) + 'px' }">
-                <span class="empty-node-icon"></span>
-                <img class="downloadIconImg" :src='downloadImgUrl'>
-                <input type="text" id="newFileInput" v-model="newFileValue" @blur="newFileBlur(node)" autocomplete="off">
-            </div>
-            <transition
-                @before-enter="beforeEnter"
-                @enter="enter"
-                @after-enter="afterEnter"
-                @before-leave="beforeLeave"
-                @leave="leave"
-                @after-leave="afterLeave">
-                <ul v-if="node.children" v-show="node.open">
-                    <TreeNode
-                        :data="node.children"
-                        :treeResult="treeResult"
-                    />
-                </ul>
-            </transition>
-        </div>
-    </li> -->
 </template>
 
 <script>
-// import downloadImgUrl from '../../static/img/download.png'
-// import Loading from './../layout/Loading'
+import Loading from './../Loading'
 import TreeNode from './TreeNode'
 import Bus from './../../bus'
 import TransitionMixin from './../../mixin/transition'
@@ -85,7 +39,8 @@ export default {
     }
   },
   components: {
-    TreeNode
+    TreeNode,
+    Loading
   },
   mixins: [TransitionMixin],
   computed: {
@@ -100,9 +55,11 @@ export default {
            node.open = !node.open
            node.hasChildren = !node.hasChildren
         }else {
+            node.isLoading = true
             let parent_id = node.id
             let url = this.host + '/dept/getDeptList?qzid=0&sessionid=q6678tprcndl44sh1coc9gdp01&upesnc=null&upesntgc=null&upesnugc=null&v=1&parent_id='+parent_id+'&page=1&count=60'
             this.$http.get(url).then((response) => {
+            node.isLoading = false
             let data = response.data.dept_list
             if(response.code == 0) {
                 if(data.length) {
@@ -124,7 +81,7 @@ export default {
                 alert(data.msg)
             }
             }).catch(() => {
-
+                node.isLoading = false
             })
         }
     }
