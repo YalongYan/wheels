@@ -16,8 +16,8 @@
 <style lang="scss" scoped>
 .loadingCtn{
     display: inline-block;
-    vertical-align: middle;
-    margin-top: 0px;
+    // vertical-align: middle;
+    margin-top: 10px;
     margin-left: -2px;
     margin-right: 5px;
 }

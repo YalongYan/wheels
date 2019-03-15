@@ -2,83 +2,54 @@
   <div id="app">
       <div class="ys-file-tree-select">
         <div class="select-head">
-            <span class="select-result">选择</span>    
+            <span class="select-result">{{selectedVal}}</span>
         </div>
         <div class="slide-ctn">
-          <Search/>
+          <Search :placeHolder="placeHolder"/>
           <div class="sub-slide-ctn">
-            <Tree :data="initData"/>
+            <Tree
+              :data="initData"
+              :treeResult="treeResult"/>
           </div>
-          <ul class="slide-ul" style="display:none">
-              <li class="slide-item">
-                  <span class="icon"></span>
-                  <span class="item-text">全局</span>
-                  <ul class="slide-ul">
-                      <li class="slide-item">
-                          <span class="icon"></span>
-                          <span class="item-text">撒打算大</span>
-                      </li>
-                      <li class="slide-item">
-                          <span class="icon"></span>
-                          <span class="item-text">啛啛喳喳</span>
-                      </li>
-                      <li class="slide-item">
-                          <span class="icon"></span>
-                          <span class="item-text">打断点</span>
-                          <ul class="slide-ul">
-                      <li class="slide-item">
-                          <span class="icon"></span>
-                          <span class="item-text">撒打算大</span>
-                      </li>
-                      <li class="slide-item">
-                          <span class="icon"></span>
-                          <span class="item-text">啛啛喳喳</span>
-                      </li>
-                      <li class="slide-item">
-                          <span class="icon"></span>
-                          <span class="item-text">打断点</span>
-                      </li>
-                  </ul>
-                      </li>
-                  </ul>
-              </li>
-              <li class="slide-item has-children">
-                  <span class="icon"></span>
-                  <span class="item-text">全局1</span>
-              </li>
-              <li class="slide-item has-children">
-                  <span class="icon"></span>
-                  <span class="item-text">全局2</span>
-              </li>
-          </ul>
         </div>
       </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
 import Search from './Serach'
 import Tree from './tree/Tree'
 import Bus from './../bus'
+import Request from './../mixin/request'
 import FormatRequestData from './../mixin/formatRequestData.js'
 
 export default {
   name: 'app',
   data () {
     return {
-      initData: [] 
+      initData: [],
+      selectedVal: '',
+      treeResult: {name: '11111'}
     }
   },
-  mixins: [FormatRequestData],
+  mixins: [FormatRequestData, Request],
   props:{
+    placeHolder: {
+      type: String,
+      default: ()=> {
+        let lang = navigator.language
+        // 简陋的多语
+        return  /^zh/.test(lang) ? '请输入' : 'Please input'
+      }
+    },
     v:{
-      type: Number,  
+      type: Number,
       default: 1
     },
     host: {
       type: String,
-      default: ''
+      default: '',
+      required: true
     },
     qzid: {
       type: String,
@@ -102,11 +73,20 @@ export default {
     },
     dept_type: {
       type: Number,
-      default: 0
+      default: 0,
+      required: true
     },
     is_org: {
       type: Number,
       default: 0
+    },
+    dataResult: {
+      type: Object,
+      default: ()=> ({})
+    },
+    deptIds_ext: {
+      type: Array,
+      default: ()=> ([])
     }
   },
   provide () {
@@ -119,7 +99,8 @@ export default {
       breadcrumbs: this.breadcrumbs,
       parent_id: this.parent_id,
       dept_type: this.dept_type,
-      is_org: this.is_org
+      is_org: this.is_org,
+      deptIds_ext: this.deptIds_ext
     }
   },
   components: {
@@ -145,47 +126,70 @@ export default {
     },
     searchData(val) {
         let keyword = val
-        let url = this.host + '/dept/getDeptList?qzid=0&upesnc=null&upesntgc=null&upesnugc=null&v=1&parent_id=0&page=1&count=60&keyword='+keyword
-        this.$http.get(url).then((response) => {
-        let data = response.data.dept_list
-        if(response.code == 0) {
-            let arr = []
-            for(let i=0; i<data.length; i++) {
-                data[i].hasChildren = true
-                data[i].open = false
-                data[i].isLoading = false
-                data[i].children = []
-                arr.push(data[i])
-            }
-            this.initData = arr
-        } else {
-            alert(data.msg)
-        }
-        }).catch(() => {
-
+        let getRequestPara = this.formatRequestData({keyword: keyword})
+        let url = this.host + '/dept/getDeptList'
+        this.$http.get(url, getRequestPara).then((response) => {
+          let data = response.data.dept_list
+          if(response.code == 0) {
+              let arr = []
+              for(let i=0; i<data.length; i++) {
+                  data[i].hasChildren = true
+                  data[i].open = false
+                  data[i].isLoading = false
+                  data[i].children = []
+                  arr.push(data[i])
+              }
+              this.initData = arr
+          } else {
+            this.originErrorFunc(data.msg)
+          }
+        }).catch((error) => {
+          this.originErrorFunc(error)
         })
+    },
+    setResult(val) {
+      this.selectedVal = val.name
+      this.$emit('select', val)
+    },
+    originErrorFunc (val) {
+      this.$emit("err", val)
+    },
+    changeLoading (id, bool) {
+      let data = this.initData
+      function getArray (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          if (arr[i].id == id) {
+            arr[i].isLoading = bool
+          } else {
+            arr[i].isLoading = false
+            getArray(arr[i].children)
+          }
+        }
+      }
+      getArray(data)
+      this.initData = data
     }
   },
   created () {
     let getRequestPara = this.formatRequestData()
-    let url = this.host + '/dept/getDeptList?' + getRequestPara
-    this.$http.get(url).then((response) => {
-    let data = response.data.dept_list
-    if(response.code == 0) {
-        let arr = []
-        for(let i=0; i<data.length; i++) {
-            data[i].hasChildren = true
-            data[i].open = false
-            data[i].isLoading = false
-            data[i].children = []
-            arr.push(data[i])
-        }
-        this.initData = arr
-    } else {
-        alert(data.msg)
-    }
-    }).catch(() => {
-
+    let url = this.host + '/dept/getDeptList'
+    this.$http.get(url, getRequestPara).then((response) => {
+      let data = response.data.dept_list
+      if(response.code == 0) {
+          let arr = []
+          for(let i=0; i<data.length; i++) {
+              data[i].hasChildren = true
+              data[i].open = false
+              data[i].isLoading = false
+              data[i].children = []
+              arr.push(data[i])
+          }
+          this.initData = arr
+      } else {
+        this.originErrorFunc(data.msg)
+      }
+    }).catch((error) => {
+      this.originErrorFunc(error)
     })
 
     Bus.$on('searchData', (val) => {
@@ -193,6 +197,19 @@ export default {
     })
     Bus.$on('addChildrenData', (id, result) => {
       this.addChildrenData(id, result)
+    })
+    // 错误处理方法
+    Bus.$on('errorFunc', (val) => {
+      this.originErrorFunc(val)
+    })
+    Bus.$on('setResult', (val) => {
+      this.setResult(val)
+    })
+    Bus.$on('changeLoading', (id, bool) => {
+      this.changeLoading(id, bool)
+    })
+    Bus.$on('setTreeResult', (obj) => {
+      this.treeResult = obj
     })
   }
 }
@@ -205,29 +222,34 @@ export default {
         margin: 0;
     }
     .ys-file-tree-select{
+        display: inline-block;
         min-width: 130px;
         max-width: 200px;
         text-align: left;
         position: relative;
-        // &:hover .slide-ctn{
-        //     opacity: 1;
-        //     height: 20px;
-        // }
+        &:hover .slide-ctn{
+          height: 280px;
+        }
 
         .select-head{
-            margin-right: 10px;
-            min-width: 96px;
-            height: 28px;
-            line-height: 28px;
-            padding: 0 8px;
-            color: #999;
-            background-color: #F5F7F8;
-            border-color: #F5F7F8;
-            font-size: 12px;
-            padding: 0;
-            margin: 0;
-            min-width: 130px;
-            border-radius: 4px;
+          margin-right: 10px;
+          min-width: 96px;
+          height: 28px;
+          line-height: 28px;
+          padding: 0 8px;
+          color: #999;
+          background-color: #F5F7F8;
+          border-color: #F5F7F8;
+          font-size: 12px;
+          padding: 0;
+          margin: 0;
+          min-width: 130px;
+          -webkit-border-radius: 4px;
+          -moz-border-radius: 4px;
+          border-radius: 4px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
 
             .select-result{
                 font-size: 12px;
@@ -242,8 +264,7 @@ export default {
         }
         .slide-ctn{
             padding-bottom: 10px;
-            opacity: 1;
-            // height: 0;
+            height: 0;
             -webkit-transition: height 200ms ease-in;
             -moz-transition: height 200ms ease-in;
             -o-transition: height 200ms ease-in;
@@ -257,6 +278,7 @@ export default {
             max-height: 365px;
             padding: 0;
             overflow: hidden;
+            z-index: 999;
 
             .sub-slide-ctn{
                 overflow-x: hidden;
@@ -292,8 +314,8 @@ export default {
               }
               .slide-item{
                 width: 100%;
-                line-height: 33px;
-                height: 33px;
+                // line-height: 33px;
+                // height: 33px;
                 position: relative;
                 padding-left: 40px;
                 font-size: 12px;
@@ -307,6 +329,7 @@ export default {
                     text-overflow: ellipsis;
                     white-space: nowrap;
                     vertical-align: top;
+                    line-height: 33px;
                 }
                 .slide-item-sub{
                     cursor: pointer;
@@ -333,7 +356,7 @@ export default {
                 //   left: 0px;
                 //   top: -17px;
                 //   background: #d0d0d0;
-                // }  
+                // }
                 .icon{
                   cursor: pointer;
                   position: absolute;
@@ -358,7 +381,7 @@ export default {
                   transform: translate(-3%, -11%);
                 }
                 &.has-children{
-                  .icon::after{
+                  &>.slide-item-sub>.icon::after{
                     display: inline-block;
                     content: '';
                     position: absolute;
@@ -371,7 +394,7 @@ export default {
                 }
               }
             }
-            
+
         }
     }
 </style>

@@ -1,18 +1,45 @@
-# slide-down-tree
+# yy多级管控组织切换
 
-> 可下拉选择的数形组件
+>
 
-## Build Setup
+
+## Install
 
 ``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
+安装方法：
+npm: npm install yy-org-switch
+yarn add yy-org-switch
 ```
+## Quick Start
+``` javascript
+<template>
+<YYOrgSwitch
+  @select="onSelect"
+  @err="onErr"
+  :deptIds_ext="[]"
+  :qzid="1"
+  :placeHolder="请选择组织"/>
+</template>
+import YYOrgSwitch from 'yy-org-switch'
+...,
+components: {YYOrgSwitch},
+methods:{
+  onErr(msg) {
 
-For detailed explanation on how things work, consult the [docs for vue-loader](http://vuejs.github.io/vue-loader).
+  },
+  onSelect(org){
+
+  }
+}
+```
+## Params
+```
+host: '空间接口api host地址',
+qzid: '圈子ID(String,必填)',
+placeHolder: '下拉框placehoder(String)',
+deptIds_ext: '业务自己的组织列表,如公告分类管理员有权限管理的分类对应的所属组织(Array)'
+select: 组织选取回调(参数为{orgId: 组织id, orgName: 组织名称}),
+err: 错误回调(参数为错误信息),
+count: 数据分页
+dept_type: 业务对应id（必填, 详见: https://wiki.upesn.com/pages/viewpage.action?pageId=2403451）
+```

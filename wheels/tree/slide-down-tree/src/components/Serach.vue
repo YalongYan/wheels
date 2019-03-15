@@ -1,7 +1,7 @@
 <template>
   <div class="ctn">
-    <img class="searchIcon" :src= searchImg>
-    <input class="input" type="text" placeholder="请输入" v-model="searchVal" @keyup.enter="searchData"/>
+    <img class="searchIcon" :src= searchImg @click="searchData" />
+    <input class="input" type="text" :placeholder="placeHolder" v-model="searchVal" @keyup.enter="searchData"/>
   </div>
 </template>
 
@@ -15,6 +15,12 @@ export default {
       msg: 'Welcome to Your Vue.js App',
       searchImg: searchImg,
       searchVal: ''
+    }
+  },
+  props:{
+    placeHolder: {
+      type: String,
+      default: ''
     }
   },
   methods: {
@@ -48,8 +54,11 @@ export default {
         vertical-align: middle;
         margin-left: 6px;
         font-size: 12px;
-        margin-top: -1px;
         width: 300px;
+        height: 16px;
+        line-height: 16px;
+        display: inline-block;
+        margin-top: 1px;
     }
 }
 </style>

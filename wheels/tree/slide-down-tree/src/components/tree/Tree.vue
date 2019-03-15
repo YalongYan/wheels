@@ -2,6 +2,7 @@
 <ul class="slide-ul">
   <TreeNode
     :data='data'
+    :treeResult='treeResult'
   />
 </ul>
 </template>
@@ -10,7 +11,7 @@
 import TreeNode from './TreeNode'
 export default {
   name: 'Tree',
-  props: ['data'],
+  props: ['data', 'treeResult'],
   data () {
     return {
     }

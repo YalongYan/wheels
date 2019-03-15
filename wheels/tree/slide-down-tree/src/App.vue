@@ -3,6 +3,12 @@
     <Main
       :host="host"
       :qzid="qzid"
+      :deptIds_ext="deptIds_ext"
+      :dataResult.sync="dataResult"
+      :placeHolder="placeHolder"
+      :dept_type="dept_type"
+      @err="errorFunc"
+      @select="onSelect"
       />
   </div>
 </template>
@@ -14,7 +20,19 @@ export default {
   data () {
     return {
       host: "http://web.api.chaoke.com:6062",
-      qzid: "16214"
+      qzid: "16214",
+      placeHolder: "请输入",
+      dataResult: {},
+      deptIds_ext: [],
+      dept_type: 0
+    }
+  },
+  methods:{
+    errorFunc(val) {
+      alert(val)
+    },
+    onSelect(val) {
+      console.log(val.name)
     }
   },
   components: {
