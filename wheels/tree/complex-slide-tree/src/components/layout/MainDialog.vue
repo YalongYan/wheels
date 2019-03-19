@@ -1,7 +1,7 @@
 <template>
 <transition name='shown'>
-  <div v-if="visable">
-    <div id='slideDonwDialog' style="width: 800px;height: 600px;">
+  <div v-show="visable">
+    <div id='slideDonwDialog' :style="{ left: dialogLeft + 'px', top: dialogTop + '%' }">
       <div class="header" @mousedown='moveAllBody'>
         <span class="title">{{$_t("orgReference")}}</span>
         <img :src='close' class="closeIcon" @click="closeDialog"/>
@@ -34,7 +34,7 @@ import locales from './../../../locales'
 import Lang from './../../mixin/lang.js'
 
 export default {
-  props: ['initData', 'treeResult', 'visable', 'defaultText', 'isShowdialogNoData'],
+  props: ['initData', 'treeResult', 'visable', 'defaultText', 'isShowdialogNoData', 'dialogLeft', 'dialogTop'],
   data () {
     return {
       close: close,
@@ -156,17 +156,17 @@ export default {
   border-radius:3px;
   border:1px solid rgba(78,89,104,0.19);
   position: fixed;
-  // left: 50%;
-  left:calc(50%-400px);
-  left:-webkit-calc(50% - 400px);
-  left:-moz-calc(50% - 400px);
-  // top: 50%;
-  top:calc(50%-301px);
-  top:-webkit-calc(50% - 301px);
-  top:-moz-calc(50% - 301px);
-  // transform: translate(-50%, -50%);
-  // margin-left: -400px;
-  // margin-top: -301px;
+  // // left: 50%;
+  // left:calc(50%-400px);
+  // left:-webkit-calc(50% - 400px);
+  // left:-moz-calc(50% - 400px);
+  // // top: 50%;
+  // top:calc(50%-301px);
+  // top:-webkit-calc(50% - 301px);
+  // top:-moz-calc(50% - 301px);
+  // // transform: translate(-50%, -50%);
+  // // margin-left: -400px;
+  // // margin-top: -301px;
 
   .header{
     height: 50px;

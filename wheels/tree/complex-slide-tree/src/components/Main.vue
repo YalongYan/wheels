@@ -13,6 +13,8 @@
     :visable.sync="visable"
     :defaultText.sync="selectedVal"
     :isShowdialogNoData="isShowdialogNoData"
+    :dialogLeft="dialogLeft"
+    :dialogTop="dialogTop"
     @confirm="lastConfirm"
   />
 </div>
@@ -41,6 +43,8 @@ export default {
       finalResult: {},
       isShowClearIcon: false,
       isShowdialogNoData: false,
+      dialogLeft: '',
+      dialogTop:'',
       locales: (() => {
             const lang = navigator.language
             let useLang = /^zh/.test(lang) ? 'zh-CN' : /^en/.test(lang) ? 'en' : lang
@@ -291,6 +295,8 @@ export default {
     Bus.$on('setTreeResult', (obj) => {
       this.treeResult = obj
     })
+    this.dialogLeft = parseInt(document.body.clientWidth/2) - 400
+    this.dialogTop = 15
   }
 }
 </script>
