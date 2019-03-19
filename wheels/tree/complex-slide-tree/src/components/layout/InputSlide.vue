@@ -15,6 +15,10 @@
             </li>
         </ul>
     </div>
+    <div class="dialogNoDataCtn" v-if="isNoData">
+        <img class="noDataImg" :src="slideDownNoData"/>
+        <div class="noDataText">{{$_t("searchWithoutResult")}}</div>
+    </div>
 </div>
 </template>
 
@@ -22,10 +26,12 @@
 import Request from './../../mixin/request.js'
 import FormatRequestData from './../../mixin/formatRequestData.js'
 import Bus from './../../bus'
-let timer
-// import PublicMethods from './../../common/methods/index.js'
+import locales from './../../../locales'
+import Lang from './../../mixin/lang.js'
 
-import { gruopSelect, cancle } from './../../static/img/base64'
+let timer
+
+import { gruopSelect, cancle, slideDownNoData} from './../../static/img/base64'
 export default {
   props: ['visable', 'defaultText', 'isShowClear'],
   data () {
@@ -36,11 +42,21 @@ export default {
         showClear: this.isShowClear,
         searchResult: [],
         isShowSlideCtn: false,
-        // PublicMethods: PublicMethods
+        slideDownNoData: slideDownNoData,
+        isNoData: false,
+        locales: (() => {
+            const lang = navigator.language
+            let useLang = /^zh/.test(lang) ? 'zh-CN' : /^en/.test(lang) ? 'en' : lang
+            // Object.keys 获取可枚举的属性 如果浏览器的语言不是英语 中文， 而且传递的lang参数也不是这两种之一，就默认使用 zh-CN
+            if (!Object.keys(locales).includes(useLang)) {
+                useLang = 'zh-CN'
+            }
+            return locales[useLang]
+        })()
     }
   },
   inject: ['host' ,'v', 'qzid', 'page', 'count', 'breadcrumbs', 'parent_id', 'dept_type', 'is_org', 'deptIds_ext'],
-  mixins: [Request, FormatRequestData],
+  mixins: [Request, FormatRequestData, Lang],
   methods:{
         clearSeatch() {
             this.searchText = ''
@@ -77,9 +93,11 @@ export default {
                     }
                     this.searchResult = arr
                     if(this.searchResult.length != 0) {
+                        this.isNoData = false
                         this.isShowSlideCtn = true
                     } else {
                         this.isShowSlideCtn = false
+                        this.isNoData = true
                     }
                 } else {
                     Bus.$emit('errorFunc', response.msg)
@@ -105,6 +123,7 @@ export default {
                     that.startSearch()
                 } else {
                     that.isShowSlideCtn = false
+                    that.isNoData = false
                 }
                 timer = undefined;
             },200)
@@ -153,6 +172,9 @@ export default {
         font-size: 14px;
         color: #555;
         width: 200px;
+        &::-ms-clear{
+            display: none;
+        }
     }
     .gruopSelectIcon{
         float: right;
@@ -228,6 +250,27 @@ export default {
             }
         }
     }
-   
+   .dialogNoDataCtn{
+        text-align: center;
+        width: 280px;
+        height: 200px;
+        background: rgba(255,255,255,1);
+        box-shadow: 0px 3px 6px 0px rgba(74,81,93,0.25);
+        border-radius: 3px;
+        border: 1px solid rgba(208,208,208,1);
+        // line-height: 200px;
+        margin-top: -1px;
+        box-sizing: border-box;
+
+        .noDataImg{
+            vertical-align: middle;
+            margin-top: 15px;
+        }
+        .noDataText{
+            text-align: center;
+            font-size: 12px;
+            color: #888888;
+        }
+   }
 }
 </style>

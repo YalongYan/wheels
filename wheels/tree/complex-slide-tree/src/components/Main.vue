@@ -12,6 +12,7 @@
     :treeResult="treeResult"
     :visable.sync="visable"
     :defaultText.sync="selectedVal"
+    :isShowdialogNoData="isShowdialogNoData"
     @confirm="lastConfirm"
   />
 </div>
@@ -26,6 +27,8 @@ import MainDialog from './layout/MainDialog'
 import Bus from './../bus'
 import Request from './../mixin/request'
 import FormatRequestData from './../mixin/formatRequestData.js'
+import locales from './../../locales'
+import Lang from './../mixin/lang.js'
 
 export default {
   name: 'app',
@@ -36,10 +39,21 @@ export default {
       treeResult: {name: '1'},
       visable: false,
       finalResult: {},
-      isShowClearIcon: false
+      isShowClearIcon: false,
+      isShowdialogNoData: false,
+      locales: (() => {
+            const lang = navigator.language
+            let useLang = /^zh/.test(lang) ? 'zh-CN' : /^en/.test(lang) ? 'en' : lang
+            // Object.keys 获取可枚举的属性 如果浏览器的语言不是英语 中文， 而且传递的lang参数也不是这两种之一，就默认使用 zh-CN
+            if (!Object.keys(locales).includes(useLang)) {
+                useLang = 'zh-CN'
+            }
+            return locales[useLang]
+      })(),
+      selectOneDataTip: ''
     }
   },
-  mixins: [FormatRequestData, Request],
+  mixins: [FormatRequestData, Request, Lang],
   props:{
     placeHolder: {
       type: String,
@@ -150,13 +164,6 @@ export default {
           let data = response.data.dept_list
           if(response.code == 0) {
               let arr = []
-              // for(let i=0; i<data.length; i++) {
-              //     data[i].hasChildren = true
-              //     data[i].open = false
-              //     data[i].isLoading = false
-              //     data[i].children = []
-              //     arr.push(data[i])
-              // }
               for(let i=0; i<data.length; i++) {
                 let dataValue = data[i].name
                 let keywordIndex = dataValue.indexOf(keyword)
@@ -174,6 +181,11 @@ export default {
                   data[i].rightValue = dataValue.substr((keyword.length + keywordIndex))
                   arr.push(data[i])
                 }
+              }
+              if(arr.length == 0) {
+                this.isShowdialogNoData = true
+              }else {
+                this.isShowdialogNoData = false
               }
               this.initData = arr
           } else {
@@ -225,7 +237,7 @@ export default {
     },
     lastConfirm() {
       if(JSON.stringify(this.finalResult) === "{}") {
-        this.originErrorFunc('请选择一条数据')
+        this.originErrorFunc(this.selectOneDataTip)
       } else {
         this.visable = false
         this.$emit('select', this.finalResult)
@@ -233,6 +245,7 @@ export default {
     }
   },
   created () {
+    this.selectOneDataTip = this.$_t('pleaseSelectAData')
     let getRequestPara = this.formatRequestData()
     let url = this.host + '/dept/getDeptList'
     this.$http.get(url, getRequestPara).then((response) => {

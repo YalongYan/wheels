@@ -3,18 +3,22 @@
   <div v-if="visable">
     <div id='slideDonwDialog' style="width: 800px;height: 600px;">
       <div class="header" @mousedown='moveAllBody'>
-        <span class="title">组织参照</span>
+        <span class="title">{{$_t("orgReference")}}</span>
         <img :src='close' class="closeIcon" @click="closeDialog"/>
         <Search style="float:right;"/>
       </div>
       <div class="sub-slide-ctn">
+        <div class="dialogNoDataCtn" v-if="isShowdialogNoData">
+          <img :src="dialogNoDataImg"/>
+          <div class="dialogNoDataDesc">{{$_t("noData")}}</div>
+        </div>
         <Tree
           :data="initData"
           :treeResult="treeResult"/>
       </div>
       <div class="footer">
-        <span class="defaultBtn cancel" @click="closeDialog">取消</span>
-        <span class="defaultBtn confirm" @click="confirm">确定</span>
+        <span class="defaultBtn cancel" @click="closeDialog"> {{$_t("cancle")}}</span>
+        <span class="defaultBtn confirm" @click="confirm"> {{$_t("confirm")}}</span>
       </div>
       <img class="resizeBar" :src="resizeBar" @mousedown='moveResize'/>
     </div>
@@ -25,16 +29,28 @@
 <script>
 import Search from './../common/Search'
 import Tree from './../tree/Tree'
-import { close, resizeBar } from './../../static/img/base64'
+import { close, resizeBar, dialogNoData } from './../../static/img/base64'
+import locales from './../../../locales'
+import Lang from './../../mixin/lang.js'
 
 export default {
-  props: ['initData', 'treeResult', 'visable', 'defaultText'],
+  props: ['initData', 'treeResult', 'visable', 'defaultText', 'isShowdialogNoData'],
   data () {
     return {
       close: close,
       resizeBar: resizeBar,
       treeResultNew: this.treeResult,
-      treeData: this.initData
+      treeData: this.initData,
+      dialogNoDataImg: dialogNoData,
+      locales: (() => {
+            const lang = navigator.language
+            let useLang = /^zh/.test(lang) ? 'zh-CN' : /^en/.test(lang) ? 'en' : lang
+            // Object.keys 获取可枚举的属性 如果浏览器的语言不是英语 中文， 而且传递的lang参数也不是这两种之一，就默认使用 zh-CN
+            if (!Object.keys(locales).includes(useLang)) {
+                useLang = 'zh-CN'
+            }
+            return locales[useLang]
+      })()
       // initData: [
       //   {hasChildren:true, name: '1111', children: [], isLoading: false, open: false},
       //   {hasChildren:true, name: '2222', children: [
@@ -43,6 +59,7 @@ export default {
       // ]
     }
   },
+  mixins: [Lang],
   methods:{
     closeDialog() {
       this.$emit('update:visable', false)
@@ -130,13 +147,15 @@ export default {
   opacity: 0;
 }
 #slideDonwDialog {
+  display: flex;
+  flex-direction: column;
   width:800px;
   height:600px;
   background:rgba(255,255,255,1);
   box-shadow:0px 6px 8px 0px rgba(74,81,93,0.25);
   border-radius:3px;
   border:1px solid rgba(78,89,104,0.19);
-  position: absolute;
+  position: fixed;
   // left: 50%;
   left:calc(50%-400px);
   left:-webkit-calc(50% - 400px);
@@ -151,9 +170,11 @@ export default {
 
   .header{
     height: 50px;
+    width: 100%;
     border-bottom: 1px solid #DDDDDD;
     line-height: 50px;
     font-size: 14px;
+    cursor: move;
 
     .title{
       float: left;
@@ -178,11 +199,11 @@ export default {
     height: 60px; 
     line-height: 60px;
     border-top: 1px solid #DDDDDD;
-    position: absolute;
+    // position: absolute;
     width: 100%;
-    bottom: 0;
-    left: 0;
-    z-index: 8;
+    // bottom: 0;
+    // left: 0;
+    // z-index: 8;
 
     .defaultBtn{
       display: inline-block;
@@ -224,6 +245,7 @@ export default {
   opacity: 0;
 }
 .sub-slide-ctn{
+    flex: 1;
     text-align: left;
     overflow-x: hidden;
     overflow-y: auto;
@@ -231,12 +253,13 @@ export default {
     height:calc(100%-110px);
     height:-webkit-calc(100% - 110px);
     height:-moz-calc(100% - 110px);
-    position: absolute;
+    // position: absolute;
     width: 100%;
-    top: 51px;
-    left: -27px;
-    z-index: 8;
+    // top: 51px;
+    // left: -27px;
+    // z-index: 8;
     padding-right: 27px;
+    margin-left: -27px;
 
     /*滚动条样式*/
     &::-webkit-scrollbar {
@@ -246,6 +269,19 @@ export default {
     &::-webkit-scrollbar-thumb {
         border-radius: 5px;
         background: #d8d8d8;
+    }
+    .dialogNoDataCtn{
+      text-align: center;
+      margin-top: -30px;
+      position: absolute;
+      width: 100%;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+    }
+    .dialogNoDataDesc{
+      color: #888888;
+      font-size: 12px;
     }
 }
 .slide-ul{
