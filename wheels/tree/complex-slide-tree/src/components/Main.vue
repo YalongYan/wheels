@@ -4,6 +4,7 @@
     <InputSlide
       :visable.sync="visable"
       :defaultText.sync="selectedVal"
+      :isShowClear.sync="isShowClearIcon"
     />
   </div>
   <MainDialog
@@ -34,7 +35,8 @@ export default {
       selectedVal: this.defaultText,
       treeResult: {name: '1'},
       visable: false,
-      finalResult: {}
+      finalResult: {},
+      isShowClearIcon: false
     }
   },
   mixins: [FormatRequestData, Request],
@@ -163,9 +165,9 @@ export default {
           this.originErrorFunc(error)
         })
     },
-    // setResult(val) {
-    //   this.$emit('select', val)
-    // },
+    setResult(val) {
+      this.$emit('select', val)
+    },
     setText(val) {
       this.selectedVal = val.name
       this.finalResult = val
@@ -244,11 +246,12 @@ export default {
     Bus.$on('errorFunc', (val) => {
       this.originErrorFunc(val)
     })
-    // Bus.$on('setResult', (val) => {
-    //   this.setResult(val)
-    // })
+    Bus.$on('setResult', (val) => {
+      this.setResult(val)
+    })
     Bus.$on('setText', (val) => {
       this.setText(val)
+      this.isShowClearIcon = true
     })
     Bus.$on('changeLoading', (id, bool) => {
       this.changeLoading(id, bool)
