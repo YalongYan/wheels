@@ -1,8 +1,8 @@
 <template>
 <transition name='shown'>
   <div v-if="visable">
-    <div id='slideDonwDialog'>
-      <div class="header">
+    <div id='slideDonwDialog' style="width: 800px;height: 600px;">
+      <div class="header" @mousedown='moveAllBody'>
         <span class="title">组织参照</span>
         <img :src='close' class="closeIcon" @click="closeDialog"/>
         <Search style="float:right;"/>
@@ -16,6 +16,7 @@
         <span class="defaultBtn cancel" @click="closeDialog">取消</span>
         <span class="defaultBtn confirm" @click="confirm">确定</span>
       </div>
+      <img class="resizeBar" :src="resizeBar" @mousedown='moveResize'/>
     </div>
   </div>
 </transition>
@@ -24,13 +25,14 @@
 <script>
 import Search from './../common/Search'
 import Tree from './../tree/Tree'
-import { close } from './../../static/img/base64'
+import { close, resizeBar } from './../../static/img/base64'
 
 export default {
   props: ['initData', 'treeResult', 'visable', 'defaultText'],
   data () {
     return {
       close: close,
+      resizeBar: resizeBar,
       treeResultNew: this.treeResult,
       treeData: this.initData
       // initData: [
@@ -47,6 +49,52 @@ export default {
     },
     confirm() {
       this.$emit("confirm")
+    },
+    moveResize(e){
+      let odiv = e.target;
+      let initX = e.clientX
+      let initY = e.clientY
+      let moveObj = document.querySelector("#slideDonwDialog")
+      let initWidth = parseInt(moveObj.style.width)
+      let initHeight = parseInt(moveObj.style.height)
+      document.onmousemove = (e)=>{ // 鼠标按下并移动的事件
+          // 用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
+          let left = e.clientX - initX;    
+          let top = e.clientY - initY;
+          // 限制最小宽度800 最小高度600
+          if(left < 0) {
+            left = 0
+          }
+          if(top < 0) {
+            top = 0
+          }
+          let lastWidth = initWidth + left
+          let lastHeight = initHeight + top
+          moveObj.style.width = lastWidth + 'px'
+          moveObj.style.height = lastHeight + 'px'
+      };
+      document.onmouseup = (e) => {
+          document.onmousemove = null;
+          document.onmouseup = null;
+      };
+    },
+    moveAllBody(e){
+      let initX = e.clientX
+      let initY = e.clientY
+      let moveObj = document.querySelector("#slideDonwDialog")
+      let initTop = parseInt(moveObj.getBoundingClientRect().top)
+      let initLeft = parseInt(moveObj.getBoundingClientRect().left)
+      document.onmousemove = (e)=>{
+          let left = e.clientX - initX;    
+          let top = e.clientY - initY;
+          //移动当前元素
+          moveObj.style.left = initLeft + left + 'px'
+          moveObj.style.top = initTop + top + 'px'
+      };
+      document.onmouseup = (e) => {
+          document.onmousemove = null;
+          document.onmouseup = null;
+      };
     }
   },
   mounted () {
@@ -89,9 +137,17 @@ export default {
   border-radius:3px;
   border:1px solid rgba(78,89,104,0.19);
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  // left: 50%;
+  left:calc(50%-400px);
+  left:-webkit-calc(50% - 400px);
+  left:-moz-calc(50% - 400px);
+  // top: 50%;
+  top:calc(50%-301px);
+  top:-webkit-calc(50% - 301px);
+  top:-moz-calc(50% - 301px);
+  // transform: translate(-50%, -50%);
+  // margin-left: -400px;
+  // margin-top: -301px;
 
   .header{
     height: 50px;
@@ -122,6 +178,11 @@ export default {
     height: 60px; 
     line-height: 60px;
     border-top: 1px solid #DDDDDD;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    z-index: 8;
 
     .defaultBtn{
       display: inline-block;
@@ -142,7 +203,15 @@ export default {
     .confirm{
       background: #E14C46;
       color: #FFFFFF;
+      margin-right: 20px;
     }
+  }
+  .resizeBar{
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    z-index: 9;
+    cursor: pointer;
   }
 }
 </style>
@@ -158,9 +227,16 @@ export default {
     text-align: left;
     overflow-x: hidden;
     overflow-y: auto;
-    // height: 228px;
-    height: 489px;
-    margin-left: -25px;
+    // height: 489px;
+    height:calc(100%-110px);
+    height:-webkit-calc(100% - 110px);
+    height:-moz-calc(100% - 110px);
+    position: absolute;
+    width: 100%;
+    top: 51px;
+    left: -27px;
+    z-index: 8;
+    padding-right: 27px;
 
     /*滚动条样式*/
     &::-webkit-scrollbar {
@@ -175,8 +251,6 @@ export default {
 .slide-ul{
   position: relative;
   font-size: 0;
-  // margin-left:-30px;
-  // margin-left: -26px;
 
   &::before{
     content: '';
@@ -216,6 +290,17 @@ export default {
         vertical-align: top;
         line-height: 33px;
         margin-left: 28px;
+    }
+    .colorWordCtn{
+      font-size: 0;
+
+      .colorWord{
+        color: #289CF2;
+        font-size: 14px;
+      }
+      .normal{
+        font-size: 14px;
+      }
     }
     .slide-item-sub{
         cursor: pointer;

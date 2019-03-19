@@ -143,19 +143,37 @@ export default {
       this.initData = data
     },
     searchData(val) {
-        let keyword = val
+        let keyword = val.trim()
         let getRequestPara = this.formatRequestData({keyword: keyword})
         let url = this.host + '/dept/getDeptList'
         this.$http.get(url, getRequestPara).then((response) => {
           let data = response.data.dept_list
           if(response.code == 0) {
               let arr = []
+              // for(let i=0; i<data.length; i++) {
+              //     data[i].hasChildren = true
+              //     data[i].open = false
+              //     data[i].isLoading = false
+              //     data[i].children = []
+              //     arr.push(data[i])
+              // }
               for(let i=0; i<data.length; i++) {
-                  data[i].hasChildren = true
-                  data[i].open = false
-                  data[i].isLoading = false
-                  data[i].children = []
+                let dataValue = data[i].name
+                let keywordIndex = dataValue.indexOf(keyword)
+                data[i].hasChildren = true
+                data[i].open = false
+                data[i].isLoading = false
+                data[i].children = []
+                if(keywordIndex >= 0) {
+                  data[i].middleValue = keyword
+                  if(keywordIndex == 0) {
+                      data[i].startvalue = ''
+                  } else {
+                      data[i].startvalue = dataValue.substr(0, keywordIndex)
+                  }
+                  data[i].rightValue = dataValue.substr((keyword.length + keywordIndex))
                   arr.push(data[i])
+                }
               }
               this.initData = arr
           } else {
@@ -209,6 +227,7 @@ export default {
       if(JSON.stringify(this.finalResult) === "{}") {
         this.originErrorFunc('请选择一条数据')
       } else {
+        this.visable = false
         this.$emit('select', this.finalResult)
       }
     }

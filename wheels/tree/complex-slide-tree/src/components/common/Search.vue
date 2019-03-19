@@ -16,6 +16,8 @@
 
 <script>
 import { searchImg } from './../../static/img/base64'
+import Bus from './../../bus'
+
 export default {
 //   props: ['data', 'treeResult'],
   data () {
@@ -27,6 +29,9 @@ export default {
     }
   },
   methods:{
+      startSearch() {
+        Bus.$emit('searchData', this.searchTtext)
+      },
       searchActive() {
         this.isActive = true
       },
