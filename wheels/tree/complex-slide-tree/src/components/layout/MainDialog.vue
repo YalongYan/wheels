@@ -312,7 +312,7 @@ export default {
 
     /*滚动条样式*/
     &::-webkit-scrollbar {
-        width: 3px;
+        width: 4px;
         height: 3px;
     }
     &::-webkit-scrollbar-thumb {
