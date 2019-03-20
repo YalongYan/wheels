@@ -1,7 +1,6 @@
 export default {
     // 防抖 等待多少时间之后再执行，这段时间内（time存在的时候）再次触发，等待时间重置
     _debounce(fn, delay) {
-        console.log(111)
         var delay = delay || 200
         var timer
         return function () {

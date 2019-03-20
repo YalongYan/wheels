@@ -72,21 +72,21 @@ export default {
       let initX = e.clientX
       let initY = e.clientY
       let moveObj = document.querySelector("#slideDonwDialog")
-      let initWidth = parseInt(moveObj.style.width)
-      let initHeight = parseInt(moveObj.style.height)
-      document.onmousemove = (e)=>{ // 鼠标按下并移动的事件
+      let initWidth = parseInt(moveObj.getBoundingClientRect().width)
+      let initHeight = parseInt(moveObj.getBoundingClientRect().height)
+      document.onmousemove = (e) => { // 鼠标按下并移动的事件
           // 用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
           let left = e.clientX - initX;    
           let top = e.clientY - initY;
-          // 限制最小宽度800 最小高度600
-          if(left < 0) {
-            left = 0
-          }
-          if(top < 0) {
-            top = 0
-          }
           let lastWidth = initWidth + left
           let lastHeight = initHeight + top
+          // 限制最小宽度800 最小高度600
+          if(lastWidth < 800) {
+            lastWidth = 800
+          }
+          if(lastHeight < 600) {
+            lastHeight = 600
+          }
           moveObj.style.width = lastWidth + 'px'
           moveObj.style.height = lastHeight + 'px'
       };
@@ -104,9 +104,26 @@ export default {
       document.onmousemove = (e)=>{
           let left = e.clientX - initX;    
           let top = e.clientY - initY;
-          //移动当前元素
-          moveObj.style.left = initLeft + left + 'px'
-          moveObj.style.top = initTop + top + 'px'
+          let bodyHeight = document.body.offsetHeight
+          let bodyWidth = document.body.offsetWidth
+          let nowLeft = moveObj.getBoundingClientRect().left
+          let nowTop = moveObj.getBoundingClientRect().top
+          let nowWidth =  moveObj.getBoundingClientRect().width
+          let nowHeight =  moveObj.getBoundingClientRect().height
+          if((initLeft + left) <= 0) {
+            moveObj.style.left = 0
+          }else if((initLeft + left) > (bodyWidth - nowWidth)){
+            moveObj.style.left = bodyWidth - nowWidth + 'px'
+          } else {
+            moveObj.style.left = initLeft + left + 'px'
+          }
+          if((initTop + top) <= 0) {
+           moveObj.style.top = 0
+          }else if((initTop + top) > (bodyHeight - nowHeight)){
+            moveObj.style.top = bodyHeight - nowHeight + 'px'
+          } else {
+            moveObj.style.top = initTop + top + 'px'
+          }
       };
       document.onmouseup = (e) => {
           document.onmousemove = null;
@@ -147,6 +164,7 @@ export default {
   opacity: 0;
 }
 #slideDonwDialog {
+  user-select:none;
   display: flex;
   flex-direction: column;
   width:800px;
