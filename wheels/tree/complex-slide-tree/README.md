@@ -1,7 +1,7 @@
 # yy多级管控组织切换
 
 >
-
+![14a6c6df-8c72-48a3-8399-884b1f6fc1ec.gif](https://upload-images.jianshu.io/upload_images/8551758-ff33ab327581fc90.gif?imageMogr2/auto-orient/strip)
 
 ## Install
 
