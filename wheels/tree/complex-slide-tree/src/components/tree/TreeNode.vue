@@ -6,9 +6,9 @@
         <div v-if="node.middleValue" class="slide-item-sub" @click.stop="setText(node)">
             <span class="icon" @click.stop="loadData(node)"></span>
             <span class="item-text colorWordCtn"> <Loading v-show="node.isLoading" :size="12"/>
-                <span class="normal">{{node.startvalue}}</span>
-                <span class="colorWord">{{node.middleValue}}</span>
-                <span class="normal">{{node.rightValue}}</span>
+                <span class="searchWordMark normal">{{node.startvalue}}</span>
+                <span class="searchWordMark colorWord">{{node.middleValue}}</span>
+                <span class="searchWordMark normal">{{node.rightValue}}</span>
             </span>
             <!-- 这个东西用来解决子集点击加载的时候 不显示loading的问题 -->
             <span class="item-text" style="display:none">{{treeResult.name}}</span>
@@ -72,7 +72,7 @@ export default {
         if(node.children.length) {
            node.open = !node.open
            node.hasChildren = !node.hasChildren
-        }else {
+        }else if(node.hasChildren){
             Bus.$emit('setTreeResult', node)
             node.isLoading = true
             let parent_id = node.id

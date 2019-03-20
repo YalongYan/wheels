@@ -172,6 +172,7 @@ export default {
                 let dataValue = data[i].name
                 let keywordIndex = dataValue.indexOf(keyword)
                 data[i].hasChildren = true
+                data[i].active = false
                 data[i].open = false
                 data[i].isLoading = false
                 data[i].children = []
@@ -246,32 +247,49 @@ export default {
         this.visable = false
         this.$emit('select', this.finalResult)
       }
+    },
+    clearTreeNodeActive() {
+      let data = this.initData
+      function getArray (arr) {
+        for (let i = 0; i < arr.length; i++) {
+          arr[i].active = false
+          if (arr[i].children.length != 0) {
+             getArray(arr[i].children)
+          }
+        }
+      }
+      getArray(data)
+      this.initData = data
+      this.finalResult = {}
+      this.selectedVal = ''
+    },
+    initDataList() {
+      this.selectOneDataTip = this.$_t('pleaseSelectAData')
+      let getRequestPara = this.formatRequestData()
+      let url = this.host + '/dept/getDeptList'
+      this.$http.get(url, getRequestPara).then((response) => {
+        let data = response.data.dept_list
+        if(response.code == 0) {
+            let arr = []
+            for(let i=0; i<data.length; i++) {
+                data[i].hasChildren = true
+                data[i].open = false
+                data[i].isLoading = false
+                data[i].active = false
+                data[i].children = []
+                arr.push(data[i])
+            }
+            this.initData = arr
+        } else {
+          this.originErrorFunc(data.msg)
+        }
+      }).catch((error) => {
+        this.originErrorFunc(error)
+      })
     }
   },
-  created () {
-    this.selectOneDataTip = this.$_t('pleaseSelectAData')
-    let getRequestPara = this.formatRequestData()
-    let url = this.host + '/dept/getDeptList'
-    this.$http.get(url, getRequestPara).then((response) => {
-      let data = response.data.dept_list
-      if(response.code == 0) {
-          let arr = []
-          for(let i=0; i<data.length; i++) {
-              data[i].hasChildren = true
-              data[i].open = false
-              data[i].isLoading = false
-              data[i].active = false
-              data[i].children = []
-              arr.push(data[i])
-          }
-          this.initData = arr
-      } else {
-        this.originErrorFunc(data.msg)
-      }
-    }).catch((error) => {
-      this.originErrorFunc(error)
-    })
-
+  created () {  
+    this.initDataList()
     Bus.$on('searchData', (val) => {
       this.searchData(val)
     })
@@ -294,6 +312,9 @@ export default {
     })
     Bus.$on('setTreeResult', (obj) => {
       this.treeResult = obj
+    })
+    Bus.$on('clearTreeNodeActive', () => {
+      this.clearTreeNodeActive()
     })
     this.dialogLeft = parseInt(document.body.clientWidth/2) - 300
     this.dialogTop = 15

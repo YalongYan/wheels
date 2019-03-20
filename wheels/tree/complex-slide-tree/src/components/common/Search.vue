@@ -56,7 +56,6 @@ export default {
         this.isActive = false
       },
       searchStart() {
-        console.log(11)
       }
   },
   mounted () {

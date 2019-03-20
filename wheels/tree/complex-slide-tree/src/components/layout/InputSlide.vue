@@ -61,6 +61,7 @@ export default {
         clearSeatch() {
             this.searchText = ''
             this.$emit('update:isShowClear', false)
+            Bus.$emit('clearTreeNodeActive')
         },
         showDailog() {
             this.$emit('update:visable', true)
@@ -132,6 +133,7 @@ export default {
   watch: {
     defaultText: {
       handler: function (newVal, oldVal) {
+        console.log(newVal)
         this.searchText = newVal
       }
     },

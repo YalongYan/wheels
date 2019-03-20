@@ -10,6 +10,7 @@ export default {
                 parent_id: this.parent_id,
                 dept_type: this.dept_type,
                 is_org: this.is_org,
+                deptIds_ext: this.deptIds_ext
             }
             if(obj && (JSON.stringify(obj) != "{}")) {
                 Object.assign(result, obj);

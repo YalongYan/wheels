@@ -98,6 +98,8 @@ export default {
       e.stopPropagation();
       e.preventDefault();
       let fa = document.getElementsByTagName('body')
+      let bodyWidth = document.body.offsetWidth
+      let bodyHeight = document.body.offsetHeight
       let box = document.getElementById("slideDonwDialog")
       let scale = document.getElementById("resizeBarImg")
       let pos = {
@@ -108,13 +110,13 @@ export default {
       };
       document.onmousemove = function (ev) {
         ev.preventDefault();
-        // 设置图片的最小缩放为30*30
-        var w = Math.max(30, ev.clientX - pos.x + pos.w)
-        var h = Math.max(30,ev.clientY - pos.y + pos.h)
+        // 设置最小缩放为600*450
+        var w = Math.max(600, ev.clientX - pos.x + pos.w)
+        var h = Math.max(450,ev.clientY - pos.y + pos.h)
 
         // 设置图片的最大宽高
-        w = w >= fa.offsetWidth-box.offsetLeft ? fa.offsetWidth-box.offsetLeft : w
-        h = h >= fa.offsetHeight-box.offsetTop ? fa.offsetHeight-box.offsetTop : h
+        w = w >= bodyWidth-box.offsetLeft ? bodyWidth-box.offsetLeft : w
+        h = h >= bodyHeight-box.offsetTop ? bodyHeight-box.offsetTop : h
         box.style.width = w + 'px';
         box.style.height = h + 'px';
       }
@@ -278,9 +280,9 @@ export default {
     right: 4px;
     bottom: 4px;
     z-index: 9;
-    cursor: pointer;
+    cursor: se-resize;
   }
-}
+  }
 </style>
 
 <style lang="scss">
@@ -304,8 +306,9 @@ export default {
     // top: 51px;
     // left: -27px;
     // z-index: 8;
-    padding-right: 27px;
+    padding-right: 24px;
     margin-left: -27px;
+    padding-top: 10px;
 
     /*滚动条样式*/
     &::-webkit-scrollbar {
@@ -382,6 +385,11 @@ export default {
       }
       .normal{
         font-size: 14px;
+      }
+      .searchWordMark{
+        display: inline-block;
+        line-height: 33px;
+        vertical-align: middle;
       }
     }
     .slide-item-sub{

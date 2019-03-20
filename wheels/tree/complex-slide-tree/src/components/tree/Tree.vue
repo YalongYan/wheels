@@ -1,5 +1,15 @@
 <template>
 <ul class="slide-ul">
+  <div style="
+    position: absolute;
+    width: 28px;
+    height: 100%;
+    right: -28px;
+    background: white;
+    bottom: 0;
+    z-index: 999;
+    top: 0;
+"></div>
   <TreeNode
     :data='data'
     :treeResult='treeResult'
