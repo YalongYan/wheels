@@ -295,7 +295,7 @@ export default {
     Bus.$on('setTreeResult', (obj) => {
       this.treeResult = obj
     })
-    this.dialogLeft = parseInt(document.body.clientWidth/2) - 400
+    this.dialogLeft = parseInt(document.body.clientWidth/2) - 300
     this.dialogTop = 15
   }
 }
@@ -310,7 +310,7 @@ export default {
     .ys-file-tree-select{
         display: inline-block;
         min-width: 130px;
-        max-width: 200px;
+        // max-width: 200px;
         text-align: left;
         position: relative;
         &:hover .slide-ctn{

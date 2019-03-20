@@ -20,7 +20,7 @@
         <span class="defaultBtn cancel" @click="closeDialog"> {{$_t("cancle")}}</span>
         <span class="defaultBtn confirm" @click="confirm"> {{$_t("confirm")}}</span>
       </div>
-      <img class="resizeBar" :src="resizeBar" @mousedown='moveResize'/>
+      <img class="resizeBar" id="resizeBarImg" :src="resizeBar" @mousedown='moveResize($event)'/>
     </div>
   </div>
 </transition>
@@ -68,31 +68,59 @@ export default {
       this.$emit("confirm")
     },
     moveResize(e){
-      let odiv = e.target;
-      let initX = e.clientX
-      let initY = e.clientY
-      let moveObj = document.querySelector("#slideDonwDialog")
-      let initWidth = parseInt(moveObj.getBoundingClientRect().width)
-      let initHeight = parseInt(moveObj.getBoundingClientRect().height)
-      document.onmousemove = (e) => { // 鼠标按下并移动的事件
-          // 用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
-          let left = e.clientX - initX;    
-          let top = e.clientY - initY;
-          let lastWidth = initWidth + left
-          let lastHeight = initHeight + top
-          // 限制最小宽度800 最小高度600
-          if(lastWidth < 800) {
-            lastWidth = 800
-          }
-          if(lastHeight < 600) {
-            lastHeight = 600
-          }
-          moveObj.style.width = lastWidth + 'px'
-          moveObj.style.height = lastHeight + 'px'
+      // let odiv = e.target;
+      // let initX = e.clientX
+      // let initY = e.clientY
+      // let moveObj = document.querySelector("#slideDonwDialog")
+      // let initWidth = parseInt(moveObj.getBoundingClientRect().width)
+      // let initHeight = parseInt(moveObj.getBoundingClientRect().height)
+      // document.onmousemove = (e) => { // 鼠标按下并移动的事件
+      //     // 用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
+      //     let left = e.clientX - initX;    
+      //     let top = e.clientY - initY;
+      //     let lastWidth = initWidth + left
+      //     let lastHeight = initHeight + top
+      //     // 限制最小宽度800 最小高度600
+      //     if(lastWidth < 800) {
+      //       lastWidth = 800
+      //     }
+      //     if(lastHeight < 600) {
+      //       lastHeight = 600
+      //     }
+      //     moveObj.style.width = lastWidth + 'px'
+      //     moveObj.style.height = lastHeight + 'px'
+      // };
+      // document.onmouseup = (e) => {
+      //     document.onmousemove = null;
+      //     document.onmouseup = null;
+      // };
+      // 阻止冒泡,避免缩放时触发移动事件
+      e.stopPropagation();
+      e.preventDefault();
+      let fa = document.getElementsByTagName('body')
+      let box = document.getElementById("slideDonwDialog")
+      let scale = document.getElementById("resizeBarImg")
+      let pos = {
+        'w': box.offsetWidth,
+        'h': box.offsetHeight,
+        'x': e.clientX,
+        'y': e.clientY
       };
+      document.onmousemove = function (ev) {
+        ev.preventDefault();
+        // 设置图片的最小缩放为30*30
+        var w = Math.max(30, ev.clientX - pos.x + pos.w)
+        var h = Math.max(30,ev.clientY - pos.y + pos.h)
+
+        // 设置图片的最大宽高
+        w = w >= fa.offsetWidth-box.offsetLeft ? fa.offsetWidth-box.offsetLeft : w
+        h = h >= fa.offsetHeight-box.offsetTop ? fa.offsetHeight-box.offsetTop : h
+        box.style.width = w + 'px';
+        box.style.height = h + 'px';
+      }
       document.onmouseup = (e) => {
-          document.onmousemove = null;
-          document.onmouseup = null;
+        document.onmousemove = null;
+        document.onmouseup = null;
       };
     },
     moveAllBody(e){
@@ -167,8 +195,8 @@ export default {
   user-select:none;
   display: flex;
   flex-direction: column;
-  width:800px;
-  height:600px;
+  width:600px;
+  height:450px;
   background:rgba(255,255,255,1);
   box-shadow:0px 6px 8px 0px rgba(74,81,93,0.25);
   border-radius:3px;
