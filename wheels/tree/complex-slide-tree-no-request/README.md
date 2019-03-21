@@ -23,6 +23,7 @@ yarn add yy-org-switch
       :name="nameTag"
       :id="idTag"
       :defaultText="defaultText"
+      :onlyOneLevel="onlyOneLevel"
       />
 </template>
 import YYOrgSwitch from 'yy-org-switch'
@@ -52,6 +53,7 @@ methods:{
   :name           搜索出来展示的信息，一般是name, 比如:如果要展示 fileName, 就传递 'fileName'
   :id                 用在树形结构请求下级数据的，一般是id，比如：如果用fileId请求下级数据，就传递fileId
   :defaultText  展示的默认值
+  :onlyOneLevel  树形组件是否只有一级
 ```
 ```
 特殊说明： loadData    searchData     返回的结果需要是promise对象，并且resolve的结果是要展示的数组数据，示例如下：
