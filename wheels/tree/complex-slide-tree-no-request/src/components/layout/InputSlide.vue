@@ -54,7 +54,6 @@ export default {
         })()
     }
   },
-//   inject: ['host' ,'v', 'qzid', 'page', 'count', 'breadcrumbs', 'parent_id', 'dept_type', 'is_org', 'deptIds_ext'],
   mixins: [Request, FormatRequestData, Lang],
   methods:{
         clearSeatch() {

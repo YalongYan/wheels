@@ -30,8 +30,6 @@ import Tree from './tree/Tree'
 import InputSlide from './layout/InputSlide'
 import MainDialog from './layout/MainDialog'
 import Bus from './../bus'
-import Request from './../mixin/request'
-import FormatRequestData from './../mixin/formatRequestData.js'
 import locales from './../../locales'
 import Lang from './../mixin/lang.js'
 
@@ -63,7 +61,7 @@ export default {
       selectOneDataTip: ''
     }
   },
-  mixins: [FormatRequestData, Request, Lang],
+  mixins: [Lang],
   props:['name', 'id', 'defaultText'],
   watch: {
     defaultText (val){
@@ -84,62 +82,6 @@ export default {
     MainDialog
   },
   methods:{
-    addChildrenData(id, result) {
-      let data = this.initData
-      function getArray (arr) {
-        for (let i = 0; i < arr.length; i++) {
-          if (arr[i].id == id) {
-            arr[i].children = result
-            arr[i].open = true
-            arr[i].hasChildren = true
-          } else {
-            getArray(arr[i].children)
-          }
-        }
-      }
-      getArray(data)
-      this.initData = data
-    },
-    searchData(val) {
-        let keyword = val.trim()
-        let getRequestPara = this.formatRequestData({keyword: keyword})
-        let url = this.host + '/dept/getDeptList'
-        this.$http.get(url, getRequestPara).then((response) => {
-          let data = response.data.dept_list
-          if(response.code == 0) {
-              let arr = []
-              for(let i=0; i<data.length; i++) {
-                let dataValue = data[i].name
-                let keywordIndex = dataValue.indexOf(keyword)
-                data[i].hasChildren = true
-                data[i].active = false
-                data[i].open = false
-                data[i].isLoading = false
-                data[i].children = []
-                if(keywordIndex >= 0) {
-                  data[i].middleValue = keyword
-                  if(keywordIndex == 0) {
-                      data[i].startvalue = ''
-                  } else {
-                      data[i].startvalue = dataValue.substr(0, keywordIndex)
-                  }
-                  data[i].rightValue = dataValue.substr((keyword.length + keywordIndex))
-                  arr.push(data[i])
-                }
-              }
-              if(arr.length == 0) {
-                this.isShowdialogNoData = true
-              }else {
-                this.isShowdialogNoData = false
-              }
-              this.initData = arr
-          } else {
-            this.originErrorFunc(data.msg)
-          }
-        }).catch((error) => {
-          this.originErrorFunc(error)
-        })
-    },
     setResult(val) {
       this.$emit('select', val)
     },
@@ -165,21 +107,6 @@ export default {
     originErrorFunc (val) {
       this.$emit("err", val)
     },
-    changeLoading (id, bool) {
-      let data = this.initData
-      function getArray (arr) {
-        for (let i = 0; i < arr.length; i++) {
-          if (arr[i].id == id) {
-            arr[i].isLoading = bool
-          } else {
-            arr[i].isLoading = false
-            getArray(arr[i].children)
-          }
-        }
-      }
-      getArray(data)
-      this.initData = data
-    },
     lastConfirm() {
       if(JSON.stringify(this.finalResult) === "{}") {
         this.originErrorFunc(this.selectOneDataTip)
@@ -189,6 +116,7 @@ export default {
       }
     },
     clearTreeNodeActive() {
+      console.log(1)
       let data = this.initData
       function getArray (arr) {
         for (let i = 0; i < arr.length; i++) {
@@ -203,31 +131,6 @@ export default {
       this.finalResult = {}
       this.selectedVal = ''
     },
-    initDataList() {
-      this.selectOneDataTip = this.$_t('pleaseSelectAData')
-      let getRequestPara = this.formatRequestData()
-      let url = this.host + '/dept/getDeptList'
-      this.$http.get(url, getRequestPara).then((response) => {
-        let data = response.data.dept_list
-        if(response.code == 0) {
-            let arr = []
-            for(let i=0; i<data.length; i++) {
-                data[i].hasChildren = true
-                data[i].open = false
-                data[i].isLoading = false
-                data[i].active = false
-                data[i].children = []
-                arr.push(data[i])
-            }
-            this.initData = arr
-        } else {
-          this.originErrorFunc(data.msg)
-        }
-      }).catch((error) => {
-        this.originErrorFunc(error)
-      })
-    },
-    // --------------------------------
     // 第三版 不用组件自己请求数据，只当做ui组件用了。
     loadData(parent_id) {
       let that = this
@@ -315,9 +218,6 @@ export default {
     Bus.$on('searchData', (val, type) => {
       this.searchData(val, type)
     })
-    Bus.$on('addChildrenData', (id, result) => {
-      this.addChildrenData(id, result)
-    })
     // 错误处理方法
     Bus.$on('errorFunc', (val) => {
       this.originErrorFunc(val)
@@ -328,12 +228,6 @@ export default {
     Bus.$on('setText', (val) => {
       this.setText(val)
       this.isShowClearIcon = true
-    })
-    Bus.$on('changeLoading', (id, bool) => {
-      this.changeLoading(id, bool)
-    })
-    Bus.$on('setTreeResult', (obj) => {
-      this.treeResult = obj
     })
     Bus.$on('clearTreeNodeActive', () => {
       this.clearTreeNodeActive()

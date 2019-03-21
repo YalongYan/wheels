@@ -5,17 +5,6 @@
     <br/>
     <br/>
     <br/>
-    <!-- <Main
-      :host="host"
-      :qzid="qzid"
-      :deptIds_ext="deptIds_ext"
-      :dataResult.sync="dataResult"
-      :placeHolder="placeHolder"
-      :dept_type="dept_type"
-      :defaultText.sync="defaultText"
-      @err="errorFunc"
-      @select="onSelect"
-      /> -->
     <Main
       @loadData="loadData"
       @searchData="searchData"
@@ -29,7 +18,6 @@
 </template>
 
 <script>
-import Request from './mixin/request'
 import Main from './components/Main.vue'
 import axios from 'axios'
 axios.defaults.withCredentials = true
@@ -47,17 +35,9 @@ export default {
       defaultText: '选择的默认值',
       nameTag: 'name',
       idTag: 'id',
-      treeData: [
-        {name: '111', id: 1, hasChildren: true, active: false, open: false, isLoading: false, children: [
-           {name: '11222', id: 4, hasChildren: true, active: false, open: false, isLoading: false, children: []},
-           {name: '11333', id: 5, hasChildren: true, active: false, open: false, isLoading: false, children: []},
-        ]},
-        {name: '222', id: 2, hasChildren: true, active: false, open: false, isLoading: false, children: []},
-        {name: '333', id: 3, hasChildren: true, active: false, open: false, isLoading: false, children: []}
-      ]
+      treeData: []
     }
   },
-  mixins: [Request],
   methods:{
     errorFunc(val) {
       alert(val)

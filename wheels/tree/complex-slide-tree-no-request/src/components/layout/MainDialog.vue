@@ -51,12 +51,6 @@ export default {
             }
             return locales[useLang]
       })()
-      // initData: [
-      //   {hasChildren:true, name: '1111', children: [], isLoading: false, open: false},
-      //   {hasChildren:true, name: '2222', children: [
-      //      {hasChildren:true, name: 'dsada', children: [], isLoading: false, open: false}
-      //   ], isLoading: false, open: true}
-      // ]
     }
   },
   mixins: [Lang],
@@ -68,32 +62,6 @@ export default {
       this.$emit("confirm")
     },
     moveResize(e){
-      // let odiv = e.target;
-      // let initX = e.clientX
-      // let initY = e.clientY
-      // let moveObj = document.querySelector("#slideDonwDialog")
-      // let initWidth = parseInt(moveObj.getBoundingClientRect().width)
-      // let initHeight = parseInt(moveObj.getBoundingClientRect().height)
-      // document.onmousemove = (e) => { // 鼠标按下并移动的事件
-      //     // 用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
-      //     let left = e.clientX - initX;    
-      //     let top = e.clientY - initY;
-      //     let lastWidth = initWidth + left
-      //     let lastHeight = initHeight + top
-      //     // 限制最小宽度800 最小高度600
-      //     if(lastWidth < 800) {
-      //       lastWidth = 800
-      //     }
-      //     if(lastHeight < 600) {
-      //       lastHeight = 600
-      //     }
-      //     moveObj.style.width = lastWidth + 'px'
-      //     moveObj.style.height = lastHeight + 'px'
-      // };
-      // document.onmouseup = (e) => {
-      //     document.onmousemove = null;
-      //     document.onmouseup = null;
-      // };
       // 阻止冒泡,避免缩放时触发移动事件
       e.stopPropagation();
       e.preventDefault();
