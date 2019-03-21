@@ -62,7 +62,7 @@ export default {
     }
   },
   mixins: [Lang],
-  props:['name', 'id', 'defaultText'],
+  props:['name', 'id', 'defaultText', 'onlyOneLevel'],
   watch: {
     defaultText (val){
       this.selectedVal = val
@@ -135,12 +135,22 @@ export default {
     loadData(parent_id) {
       let that = this
       return this.$parent.loadData(parent_id).then((res)=>{
-        for (let i=0; i<res.length; i++){
-          res[i].children = []
-          res[i].hasChildren = true
-          res[i].isLoading = false
-          res[i].open = false
-          res[i].active = false
+        if(this.onlyOneLevel) {
+          for (let i=0; i<res.length; i++){
+            res[i].children = []
+            res[i].hasChildren = false
+            res[i].isLoading = false
+            res[i].open = false
+            res[i].active = false
+          }
+        }else {
+          for (let i=0; i<res.length; i++){
+            res[i].children = []
+            res[i].hasChildren = true
+            res[i].isLoading = false
+            res[i].open = false
+            res[i].active = false
+          }
         }
         // 有parent_id 就是请求的下级数据 需要处理 tree 的 data
         if(parent_id) {

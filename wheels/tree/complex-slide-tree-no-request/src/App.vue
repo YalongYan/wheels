@@ -13,6 +13,7 @@
       :name="nameTag"
       :id="idTag"
       :defaultText="defaultText"
+      :onlyOneLevel="onlyOneLevel"
       />
   </div>
 </template>
@@ -35,7 +36,8 @@ export default {
       defaultText: '选择的默认值',
       nameTag: 'name',
       idTag: 'id',
-      treeData: []
+      treeData: [],
+      onlyOneLevel: true
     }
   },
   methods:{
