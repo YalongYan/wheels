@@ -11,11 +11,11 @@
                 <span class="searchWordMark normal">{{node.rightValue}}</span>
             </span>
             <!-- 这个东西用来解决子集点击加载的时候 不显示loading的问题 -->
-            <span class="item-text" style="display:none">{{treeResult.name}}</span>
+            <span class="item-text" style="display:none">{{treeResult[name]}}</span>
         </div>
         <div v-else class="slide-item-sub" @click.stop="setText(node)">
             <span class="icon" @click.stop="loadData(node)"></span>
-            <span class="item-text"> <Loading v-show="node.isLoading" :size="12"/> {{node.name}}</span>
+            <span class="item-text"> <Loading v-show="node.isLoading" :size="12"/> {{node[name]}}</span>
             <!-- 这个东西用来解决子集点击加载的时候 不显示loading的问题 -->
             <span class="item-text" style="display:none">{{treeResult.name}}</span>
         </div>
@@ -48,7 +48,8 @@ import FormatRequestData from './../../mixin/formatRequestData.js'
 export default {
   name: 'TreeNode',
   props: ['data', 'treeResult'],
-  inject: ['host' ,'v', 'qzid', 'page', 'count', 'breadcrumbs', 'parent_id', 'dept_type', 'is_org', 'deptIds_ext'],
+//   inject: ['host' ,'v', 'qzid', 'page', 'count', 'breadcrumbs', 'parent_id', 'dept_type', 'is_org', 'deptIds_ext'],
+  inject: ['name', 'id', 'defaultText'],
   data () {
     return {
     }
@@ -73,37 +74,39 @@ export default {
            node.open = !node.open
            node.hasChildren = !node.hasChildren
         }else if(node.hasChildren){
-            Bus.$emit('setTreeResult', node)
             node.isLoading = true
-            let parent_id = node.id
-            let getRequestPara = this.formatRequestData({parent_id: parent_id})
-            let url = this.host + '/dept/getDeptList'
-            this.$http.get(url, getRequestPara).then((response) => {
-                node.isLoading = false
-                let data = response.data.dept_list
-                if(response.code == 0) {
-                    if(data.length) {
-                        let arr = []
-                        for(let i=0; i<data.length; i++) {
-                            data[i].hasChildren = true
-                            data[i].open = false
-                            data[i].active = false
-                            data[i].children = []
-                            arr.push(data[i])
-                        }
-                        Bus.$emit('addChildrenData', parent_id, arr)
-                    } else {
-                        node.hasChildren = false
-                        node.open = false
-                    }
-                    node.hasChildren = false
-                } else {
-                    Bus.$emit('errorFunc', response.msg)
-                }
-            }).catch((error) => {
-                Bus.$emit('errorFunc', error)
-                node.isLoading = false
-            })
+            Bus.$emit('setTreeResult', node)
+            Bus.$emit('loadData',  node[this.id])
+            // node.isLoading = true
+            // let parent_id = node.id
+            // let getRequestPara = this.formatRequestData({parent_id: parent_id})
+            // let url = this.host + '/dept/getDeptList'
+            // this.$http.get(url, getRequestPara).then((response) => {
+            //     node.isLoading = false
+            //     let data = response.data.dept_list
+            //     if(response.code == 0) {
+            //         if(data.length) {
+            //             let arr = []
+            //             for(let i=0; i<data.length; i++) {
+            //                 data[i].hasChildren = true
+            //                 data[i].open = false
+            //                 data[i].active = false
+            //                 data[i].children = []
+            //                 arr.push(data[i])
+            //             }
+            //             Bus.$emit('addChildrenData', parent_id, arr)
+            //         } else {
+            //             node.hasChildren = false
+            //             node.open = false
+            //         }
+            //         node.hasChildren = false
+            //     } else {
+            //         Bus.$emit('errorFunc', response.msg)
+            //     }
+            // }).catch((error) => {
+            //     Bus.$emit('errorFunc', error)
+            //     node.isLoading = false
+            // })
         }
     }
   }

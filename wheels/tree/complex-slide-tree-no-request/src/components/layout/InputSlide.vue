@@ -4,7 +4,7 @@
     <input type="text" class="input"  v-model="searchText" @keyup="debounce"/>
     <img :src='gruopSelect' @click="showDailog" class="gruopSelectIcon"/>
     <img :src='cancle' class="cancleIcon" v-if="showClear" @click="clearSeatch"/>
-    <div class="slideContainer" v-show="isShowSlideCtn">
+    <div class="slideContainer" v-show="subIsShowSlideCtn">
         <ul v-for="node in searchResult" :key="node.id" class="sldieCtn">
             <li class="item" @click="selectItem(node)">
                 <span class="itemText">
@@ -15,7 +15,7 @@
             </li>
         </ul>
     </div>
-    <div class="dialogNoDataCtn" v-if="isNoData">
+    <div class="dialogNoDataCtn" v-if="subIsNoData">
         <img class="noDataImg" :src="slideDownNoData"/>
         <div class="noDataText">{{$_t("searchWithoutResult")}}</div>
     </div>
@@ -33,17 +33,16 @@ let timer
 
 import { gruopSelect, cancle, slideDownNoData} from './../../static/img/base64'
 export default {
-  props: ['visable', 'defaultText', 'isShowClear'],
+  props: ['visable', 'defaultText', 'isShowClear', 'isShowdialogNoData', 'isNoData', 'isShowSlideCtn', 'searchResult'],
   data () {
     return {
         gruopSelect: gruopSelect,
         cancle: cancle,
         searchText: this.defaultText,
         showClear: this.isShowClear,
-        searchResult: [],
-        isShowSlideCtn: false,
         slideDownNoData: slideDownNoData,
-        isNoData: false,
+        subIsNoData: this.isNoData,
+        subIsShowSlideCtn: this.isShowSlideCtn,
         locales: (() => {
             const lang = navigator.language
             let useLang = /^zh/.test(lang) ? 'zh-CN' : /^en/.test(lang) ? 'en' : lang
@@ -55,7 +54,7 @@ export default {
         })()
     }
   },
-  inject: ['host' ,'v', 'qzid', 'page', 'count', 'breadcrumbs', 'parent_id', 'dept_type', 'is_org', 'deptIds_ext'],
+//   inject: ['host' ,'v', 'qzid', 'page', 'count', 'breadcrumbs', 'parent_id', 'dept_type', 'is_org', 'deptIds_ext'],
   mixins: [Request, FormatRequestData, Lang],
   methods:{
         clearSeatch() {
@@ -66,51 +65,11 @@ export default {
         showDailog() {
             this.$emit('update:visable', true)
         },
-        startSearch() {
-            let keyword = this.searchText.trim()
-            let getRequestPara = this.formatRequestData({keyword: keyword})
-            let url = this.host + '/dept/getDeptList'
-            this.$http.get(url, getRequestPara).then((response) => {
-                let data = response.data.dept_list
-                if(response.code == 0) {
-                    let arr = []
-                    for(let i=0; i<data.length; i++) {
-                        let dataValue = data[i].name
-                        let keywordIndex = dataValue.indexOf(keyword)
-                        data[i].hasChildren = true
-                        data[i].open = false
-                        data[i].isLoading = false
-                        data[i].children = []
-                        if(keywordIndex >= 0) {
-                            data[i].middleValue = keyword
-                            if(keywordIndex == 0) {
-                               data[i].startvalue = ''
-                            } else {
-                               data[i].startvalue = dataValue.substr(0, keywordIndex)
-                            }
-                            data[i].rightValue = dataValue.substr((keyword.length + keywordIndex))
-                            arr.push(data[i])
-                       }
-                    }
-                    this.searchResult = arr
-                    if(this.searchResult.length != 0) {
-                        this.isNoData = false
-                        this.isShowSlideCtn = true
-                    } else {
-                        this.isShowSlideCtn = false
-                        this.isNoData = true
-                    }
-                } else {
-                    Bus.$emit('errorFunc', response.msg)
-                }
-            }).catch((error) => {
-                Bus.$emit('errorFunc', error)
-            })
-        },
         selectItem(node) {
             this.searchText = node.name
             this.$emit('update:isShowClear', true)
-            this.isShowSlideCtn = false
+            this.$emit('update:isShowSlideCtn', false)
+            // this.isShowSlideCtn = false
             Bus.$emit('setResult', node)
         },
         // 防抖 最后输入 一段时间后才执行
@@ -121,10 +80,10 @@ export default {
             }
             timer = setTimeout(function () {
                 if(that.searchText.trim()) { // 输入为空的时候 不请求数据
-                    that.startSearch()
+                    Bus.$emit('searchData', that.searchText, 1)
                 } else {
-                    that.isShowSlideCtn = false
-                    that.isNoData = false
+                    that.subIsShowSlideCtn = false
+                    that.subIsNoData = false
                 }
                 timer = undefined;
             },200)
@@ -133,13 +92,22 @@ export default {
   watch: {
     defaultText: {
       handler: function (newVal, oldVal) {
-        console.log(newVal)
         this.searchText = newVal
       }
     },
     isShowClear: {
       handler: function (newVal, oldVal) {
         this.showClear = newVal
+      }
+    },
+    isNoData: {
+      handler: function (newVal, oldVal) {
+        this.subIsNoData = newVal
+      }
+    },
+    isShowSlideCtn: {
+      handler: function (newVal, oldVal) {
+        this.subIsShowSlideCtn = newVal
       }
     }
   },

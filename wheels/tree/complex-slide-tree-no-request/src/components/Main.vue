@@ -5,6 +5,9 @@
       :visable.sync="visable"
       :defaultText.sync="selectedVal"
       :isShowClear.sync="isShowClearIcon"
+      :isNoData.sync="isNoData" 
+      :isShowSlideCtn.sync="isShowSlideCtn"
+      :searchResult="searchResult"
     />
   </div>
   <MainDialog
@@ -45,6 +48,9 @@ export default {
       isShowdialogNoData: false,
       dialogLeft: '',
       dialogTop:'',
+      isNoData: false,
+      isShowSlideCtn: false,
+      searchResult: [],
       locales: (() => {
             const lang = navigator.language
             let useLang = /^zh/.test(lang) ? 'zh-CN' : /^en/.test(lang) ? 'en' : lang
@@ -58,66 +64,7 @@ export default {
     }
   },
   mixins: [FormatRequestData, Request, Lang],
-  props:{
-    placeHolder: {
-      type: String,
-      default: ()=> {
-        let lang = navigator.language
-        // 简陋的多语
-        return  /^zh/.test(lang) ? '请输入' : 'Please input'
-      }
-    },
-    v:{
-      type: Number,
-      default: 1
-    },
-    host: {
-      type: String,
-      default: '',
-      required: true
-    },
-    qzid: {
-      type: String,
-      default: ''
-    },
-    page: {
-      type: Number,
-      default: 1
-    },
-    count: {
-      type: Number,
-      default: 60
-    },
-    breadcrumbs: {
-      type: Number,
-      default: 0
-    },
-    parent_id: {
-      type: Number,
-      default: 0
-    },
-    dept_type: {
-      type: Number,
-      default: 0,
-      required: true
-    },
-    is_org: {
-      type: Number,
-      default: 0
-    },
-    dataResult: {
-      type: Object,
-      default: ()=> ({})
-    },
-    deptIds_ext: {
-      type: Array,
-      default: ()=> ([])
-    },
-    defaultText: {
-      type: String,
-      default: ''
-    }
-  },
+  props:['name', 'id', 'defaultText'],
   watch: {
     defaultText (val){
       this.selectedVal = val
@@ -125,16 +72,9 @@ export default {
   },
   provide () {
     return {
-      host: this.host,
-      v: this.v,
-      qzid: this.qzid,
-      page: this.page,
-      count: this.count,
-      breadcrumbs: this.breadcrumbs,
-      parent_id: this.parent_id,
-      dept_type: this.dept_type,
-      is_org: this.is_org,
-      deptIds_ext: this.deptIds_ext
+      name: this.name,
+      id: this.id,
+      defaultText: this.defaultText
     }
   },
   components: {
@@ -286,12 +226,94 @@ export default {
       }).catch((error) => {
         this.originErrorFunc(error)
       })
+    },
+    // --------------------------------
+    // 第三版 不用组件自己请求数据，只当做ui组件用了。
+    loadData(parent_id) {
+      let that = this
+      return this.$parent.loadData(parent_id).then((res)=>{
+        for (let i=0; i<res.length; i++){
+          res[i].children = []
+          res[i].hasChildren = true
+          res[i].isLoading = false
+          res[i].open = false
+          res[i].active = false
+        }
+        // 有parent_id 就是请求的下级数据 需要处理 tree 的 data
+        if(parent_id) {
+          let data = this.initData
+          let id = parent_id
+          function getArray (arr) {
+            for (let i = 0; i < arr.length; i++) {
+              if (arr[i][that.id] == id && res.length != 0) {
+                arr[i].isLoading = false
+                arr[i].hasChildren = false
+                arr[i].open = true
+                arr[i].children = res
+              } else if(arr[i][that.id] == id && res.length == 0) {
+                arr[i].isLoading = false
+                arr[i].open = false
+                arr[i].hasChildren = false
+              } else {
+                getArray(arr[i].children)
+              }
+            }
+          }
+          getArray(data)
+          that.initData = data
+        }else {
+          that.initData = res
+        }
+      })
+    },
+    // type: 1是外面的主搜索  2是弹框内的搜索
+    searchData(keyword, type) {
+      let that = this
+      return this.$parent.searchData(keyword).then((res) => {
+        let data = res
+        let arr = []
+        for(let i=0; i<data.length; i++) {
+          let dataValue = data[i][this.name]
+          let keywordIndex = dataValue.indexOf(keyword)
+          data[i].hasChildren = true
+          data[i].active = false
+          data[i].open = false
+          data[i].isLoading = false
+          data[i].children = []
+          if(keywordIndex >= 0) {
+            data[i].middleValue = keyword
+            if(keywordIndex == 0) {
+                data[i].startvalue = ''
+            } else {
+                data[i].startvalue = dataValue.substr(0, keywordIndex)
+            }
+            data[i].rightValue = dataValue.substr((keyword.length + keywordIndex))
+            arr.push(data[i])
+          }
+        }
+        if(type == 1) {
+          this.searchResult = arr
+          if(arr.length != 0) {
+              this.isNoData = false
+              this.isShowSlideCtn = true
+          } else {
+              this.isShowSlideCtn = false
+              this.isNoData = true
+          }
+        } else {
+          this.initData = arr
+        }
+      })
     }
   },
-  created () {  
-    this.initDataList()
-    Bus.$on('searchData', (val) => {
-      this.searchData(val)
+  created () {
+    this.selectOneDataTip = this.$_t('pleaseSelectAData')
+    console.log(this.loadData(0))
+    Bus.$on('loadData', (val) => {
+      return this.loadData(val)
+    })
+    Bus.$on('searchData', (val, type) => {
+      this.searchData(val, type)
     })
     Bus.$on('addChildrenData', (id, result) => {
       this.addChildrenData(id, result)

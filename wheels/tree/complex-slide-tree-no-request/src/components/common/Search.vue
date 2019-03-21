@@ -42,7 +42,7 @@ export default {
   mixins: [Lang],
   methods:{
       startSearch() {
-        Bus.$emit('searchData', this.searchTtext)
+        Bus.$emit('searchData', this.searchTtext, 2)
       },
       searchActive() {
         this.isActive = true

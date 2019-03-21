@@ -12,6 +12,7 @@
       :dataResult.sync="dataResult"
       :placeHolder="placeHolder"
       :dept_type="dept_type"
+      :is_org="is_org"
       :defaultText.sync="defaultText"
       @err="errorFunc"
       @select="onSelect"
@@ -29,9 +30,10 @@ export default {
       qzid: "16214",
       placeHolder: "请输入",
       dataResult: {},
-      deptIds_ext: [],
+      deptIds_ext: '111111',
       dept_type: 0,
       defaultText: '选择的默认值',
+      is_org: 22
     }
   },
   methods:{
