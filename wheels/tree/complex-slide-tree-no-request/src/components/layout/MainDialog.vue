@@ -5,7 +5,7 @@
       <div class="header" @mousedown='moveAllBody'>
         <span class="title">{{$_t("orgReference")}}</span>
         <img :src='close' class="closeIcon" @click="closeDialog"/>
-        <Search style="float:right;"/>
+        <Search v-if="!noSearch" style="float:right;"/>
       </div>
       <div class="sub-slide-ctn">
         <div class="dialogNoDataCtn" v-if="isShowdialogNoData">
@@ -34,7 +34,7 @@ import locales from './../../../locales'
 import Lang from './../../mixin/lang.js'
 
 export default {
-  props: ['initData', 'treeResult', 'visable', 'defaultText', 'isShowdialogNoData', 'dialogLeft', 'dialogTop'],
+  props: ['initData', 'treeResult', 'visable', 'defaultText', 'isShowdialogNoData', 'dialogLeft', 'dialogTop', 'noSearch'],
   data () {
     return {
       close: close,
@@ -161,6 +161,12 @@ export default {
   // transform: translateY(-50px);
   opacity: 0;
 }
+#slideDonwDialog>.sub-slide-ctn>.slide-ul>div>.slide-item::after{
+  display: none;
+}
+.sub-slide-ctn>.slide-ul>.treeNodeCtn{
+  background: red;
+}
 #slideDonwDialog {
   user-select:none;
   display: flex;
@@ -172,6 +178,8 @@ export default {
   border-radius:3px;
   border:1px solid rgba(78,89,104,0.19);
   position: fixed;
+  z-index: 9999;
+  overflow: hidden;
   // // left: 50%;
   // left:calc(50%-400px);
   // left:-webkit-calc(50% - 400px);
@@ -305,20 +313,20 @@ export default {
   position: relative;
   font-size: 0;
 
-  &::before{
-    content: '';
-    display: inline-block;
-    position: absolute;
-    width: 1px;
-    left: 27px;
-    top: 0;
-    bottom: 16px;
-    background: #d0d0d0;
-  }
-  .slide-item:nth-of-type(1)::after {
-    top: 0;
-    height: 16px;
-  }
+  // &::before{
+  //   content: '';
+  //   display: inline-block;
+  //   position: absolute;
+  //   width: 1px;
+  //   left: 27px;
+  //   top: 0;
+  //   bottom: 16px;
+  //   background: #d0d0d0;
+  // }
+  // .slide-item:nth-of-type(1)::after {
+  //   top: 0;
+  //   height: 16px;
+  // }
   .slide-item{
     width: 100%;
     // line-height: 33px;
@@ -342,7 +350,7 @@ export default {
         white-space: nowrap;
         vertical-align: top;
         line-height: 33px;
-        margin-left: 28px;
+        margin-left: 26px;
     }
     .colorWordCtn{
       font-size: 0;
@@ -371,11 +379,22 @@ export default {
       content: '';
       display: inline-block;
       position: absolute;
-      width: 13px;
+      width: 14px;
       height: 1px;
-      left: 28px;
-      top: 16px;
+      left: 27px;
+      top: 15px;
       background: #d0d0d0;
+    }
+    &::after{
+      content: '';
+      display: inline-block;
+      position: absolute;
+      width: 1px;
+      height: 100%;
+      left: 26px;
+      top: -1px;
+      background: #d0d0d0;
+      bottom: -1px;
     }
     .icon{
       cursor: pointer;
@@ -412,6 +431,9 @@ export default {
         top: 2px;
       }
     }
+  }
+  .slide-item:last-child::after{
+    height: 17px;
   }
 }
 

@@ -1,4 +1,5 @@
 <template>
+<div class="yyOrgSelect">
     <div class="ctn"
         :class="{'active': isActive}">
         <input type="text"
@@ -12,6 +13,8 @@
         <img class="searchIcon" :src="searchImg" @click="searchStart"/>
         <!-- <i class="search-icon"></i> -->
     </div>
+</div>
+    
 </template>
 
 <script>
@@ -69,55 +72,59 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.ctn{
-    height: 28px;
-    line-height: 28px;
-    margin-top: 11px;
-    border-bottom: none;
-    width: 19px;
-    transition: width 0.5s;
-    position: relative;
+.yyOrgSelect{
+    .ctn{
+        height: 28px;
+        line-height: 28px;
+        margin-top: 11px;
+        border-bottom: none;
+        width: 19px;
+        transition: width 0.5s;
+        position: relative;
+        border: none;
 
-    .searchIcon{
-        position: absolute;
-        right: 6px;
-        z-index: 2;
-        top: 6px;
-        cursor: pointer;
-        pointer-events: none;
+        .searchIcon{
+            position: absolute;
+            right: 6px;
+            z-index: 2;
+            top: 6px;
+            cursor: pointer;
+            pointer-events: none;
+        }
+        // .search-icon{
+        // }
+        .searchInp{
+                -webkit-transition: width 0.5s;
+        -o-transition: width 0.5s;
+        -moz-transition: width 0.5s;
+        transition: width 0.5s;
+        font-size: 14px;
+        outline: none;
+        border: none;
+        line-height: 22px;
+        /* position: absolute; */
+        width: 0;
+        left: 0;
+        /* top: 2px; */
+        z-index: 1;
+        padding-right: 30px;
+        vertical-align: middle;
+        margin-top: -2px;
+            &::-ms-clear{
+                display: none;
+            }
+        }
     }
-    // .search-icon{
-    // }
-    .searchInp{
-            -webkit-transition: width 0.5s;
-    -o-transition: width 0.5s;
-    -moz-transition: width 0.5s;
-    transition: width 0.5s;
-    font-size: 14px;
-    outline: none;
-    border: none;
-    line-height: 22px;
-    /* position: absolute; */
-    width: 0;
-    left: 0;
-    /* top: 2px; */
-    z-index: 1;
-    padding-right: 30px;
-    vertical-align: middle;
-    margin-top: -2px;
-        &::-ms-clear{
-            display: none;
+    .active{
+        width: 300px;
+        border-bottom: 1px solid #888;
+
+        .searchInp{
+            width: 270px;
+        }
+        .searchIcon{
         }
     }
 }
-.active{
-    width: 300px;
-    border-bottom: 1px solid #888;
 
-    .searchInp{
-        width: 270px;
-    }
-    .searchIcon{
-    }
-}
 </style>

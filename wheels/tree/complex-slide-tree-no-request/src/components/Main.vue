@@ -8,6 +8,7 @@
       :isNoData.sync="isNoData" 
       :isShowSlideCtn.sync="isShowSlideCtn"
       :searchResult="searchResult"
+      :noSearch="noSearch"
     />
   </div>
   <MainDialog
@@ -18,6 +19,7 @@
     :isShowdialogNoData="isShowdialogNoData"
     :dialogLeft="dialogLeft"
     :dialogTop="dialogTop"
+    :noSearch="noSearch"
     @confirm="lastConfirm"
   />
 </div>
@@ -39,6 +41,7 @@ export default {
     return {
       initData: [],
       selectedVal: this.defaultText,
+      tempSelectedVal: '',
       treeResult: {name: '1'},
       visable: false,
       finalResult: {},
@@ -62,7 +65,7 @@ export default {
     }
   },
   mixins: [Lang],
-  props:['name', 'id', 'defaultText', 'onlyOneLevel'],
+  props:['name', 'id', 'defaultText', 'onlyOneLevel', 'noSearch'],
   watch: {
     defaultText (val){
       this.selectedVal = val
@@ -86,13 +89,15 @@ export default {
       this.$emit('select', val)
     },
     setText(val) {
-      this.selectedVal = val.name
+      // this.selectedVal = val[this.name]
+      let that = this
+      this.tempSelectedVal = val[this.name]
       this.finalResult = val
       let data = this.initData
-      let id = val.id
+      let id = val[this.id]
       function getArray (arr) {
         for (let i = 0; i < arr.length; i++) {
-          if (arr[i].id == id) {
+          if (arr[i][that.id] == id) {
             arr[i].active = true
           } else {
             arr[i].active = false
@@ -111,12 +116,13 @@ export default {
       if(JSON.stringify(this.finalResult) === "{}") {
         this.originErrorFunc(this.selectOneDataTip)
       } else {
+        this.selectedVal = this.tempSelectedVal
         this.visable = false
+        this.isShowClearIcon = true
         this.$emit('select', this.finalResult)
       }
     },
     clearTreeNodeActive() {
-      console.log(1)
       let data = this.initData
       function getArray (arr) {
         for (let i = 0; i < arr.length; i++) {
@@ -129,12 +135,13 @@ export default {
       getArray(data)
       this.initData = data
       this.finalResult = {}
+      this.$emit('select', this.finalResult)
       this.selectedVal = ''
     },
     // 第三版 不用组件自己请求数据，只当做ui组件用了。
     loadData(parent_id) {
       let that = this
-      return this.$parent.loadData(parent_id).then((res)=>{
+      return this.$parent.yyOrgSelectLoadData(parent_id).then((res)=>{
         if(this.onlyOneLevel) {
           for (let i=0; i<res.length; i++){
             res[i].children = []
@@ -143,7 +150,7 @@ export default {
             res[i].open = false
             res[i].active = false
           }
-        }else {
+        } else{
           for (let i=0; i<res.length; i++){
             res[i].children = []
             res[i].hasChildren = true
@@ -152,8 +159,8 @@ export default {
             res[i].active = false
           }
         }
-        // 有parent_id 就是请求的下级数据 需要处理 tree 的 data
-        if(parent_id) {
+        // initData有数据就是请求下级数据  没有数据就是初始化数据
+        if(this.initData.length != 0) {
           let data = this.initData
           let id = parent_id
           function getArray (arr) {
@@ -182,13 +189,17 @@ export default {
     // type: 1是外面的主搜索  2是弹框内的搜索
     searchData(keyword, type) {
       let that = this
-      return this.$parent.searchData(keyword).then((res) => {
+      return this.$parent.yyOrgSelectSearchData(keyword).then((res) => {
         let data = res
         let arr = []
         for(let i=0; i<data.length; i++) {
           let dataValue = data[i][this.name]
           let keywordIndex = dataValue.indexOf(keyword)
-          data[i].hasChildren = true
+          if(that.onlyOneLevel) {
+            data[i].hasChildren = false
+          } else {
+            data[i].hasChildren = true
+          }
           data[i].active = false
           data[i].open = false
           data[i].isLoading = false
@@ -221,7 +232,7 @@ export default {
   },
   created () {
     this.selectOneDataTip = this.$_t('pleaseSelectAData')
-    console.log(this.loadData(0))
+    this.loadData()
     Bus.$on('loadData', (val) => {
       return this.loadData(val)
     })
@@ -237,7 +248,6 @@ export default {
     })
     Bus.$on('setText', (val) => {
       this.setText(val)
-      this.isShowClearIcon = true
     })
     Bus.$on('clearTreeNodeActive', () => {
       this.clearTreeNodeActive()
@@ -332,16 +342,16 @@ export default {
             .slide-ul{
               position: relative;
 
-              &::before{
-                content: '';
-                display: inline-block;
-                position: absolute;
-                width: 1px;
-                left: 0px;
-                top: 0;
-                bottom: 16px;
-                background: #d0d0d0;
-              }
+              // &::before{
+              //   content: '';
+              //   display: inline-block;
+              //   position: absolute;
+              //   width: 1px;
+              //   left: 0px;
+              //   top: 0;
+              //   bottom: 16px;
+              //   background: #d0d0d0;
+              // }
               .slide-item:nth-of-type(1)::after {
                 top: 0;
                 height: 16px;
@@ -371,16 +381,16 @@ export default {
                     background:rgba(243,243,243,1);
                     }
                 }
-                &::before{
-                  content: '';
-                  display: inline-block;
-                  position: absolute;
-                  width: 13px;
-                  height: 1px;
-                  left: 0px;
-                  top: 16px;
-                  background: #d0d0d0;
-                }
+                // &::before{
+                //   content: '';
+                //   display: inline-block;
+                //   position: absolute;
+                //   width: 13px;
+                //   height: 1px;
+                //   left: 0px;
+                //   top: 16px;
+                //   background: #d0d0d0;
+                // }
                 // &::after{
                 //   content: '';
                 //   display: inline-block;

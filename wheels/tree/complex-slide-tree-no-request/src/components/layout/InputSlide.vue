@@ -33,7 +33,8 @@ let timer
 
 import { gruopSelect, cancle, slideDownNoData} from './../../static/img/base64'
 export default {
-  props: ['visable', 'defaultText', 'isShowClear', 'isShowdialogNoData', 'isNoData', 'isShowSlideCtn', 'searchResult'],
+  props: ['visable', 'defaultText', 'isShowClear', 'isShowdialogNoData', 'isNoData', 'isShowSlideCtn', 'searchResult', 'noSearch'],
+  inject: ['name', 'id'],
   data () {
     return {
         gruopSelect: gruopSelect,
@@ -65,7 +66,7 @@ export default {
             this.$emit('update:visable', true)
         },
         selectItem(node) {
-            this.searchText = node.name
+            this.searchText = node[this.name]
             this.$emit('update:isShowClear', true)
             this.$emit('update:isShowSlideCtn', false)
             // this.isShowSlideCtn = false
@@ -73,19 +74,22 @@ export default {
         },
         // 防抖 最后输入 一段时间后才执行
         debounce: function(){
-            let that = this
-            if(timer){
-                clearTimeout(timer)
-            }
-            timer = setTimeout(function () {
-                if(that.searchText.trim()) { // 输入为空的时候 不请求数据
-                    Bus.$emit('searchData', that.searchText, 1)
-                } else {
-                    that.subIsShowSlideCtn = false
-                    that.subIsNoData = false
+            if(!this.noSearch) {
+                let that = this
+                if(timer){
+                    clearTimeout(timer)
                 }
-                timer = undefined;
-            },200)
+                timer = setTimeout(function () {
+                    if(that.searchText.trim()) { // 输入为空的时候 不请求数据
+                        Bus.$emit('searchData', that.searchText, 1)
+                    } else {
+                        that.subIsShowSlideCtn = false
+                        that.subIsNoData = false
+                    }
+                    timer = undefined;
+                },200)
+            }
+            
         }
   },
   watch: {
@@ -166,6 +170,7 @@ export default {
         border:1px solid rgba(208,208,208,1);
         position: absolute;
         top: 29px;
+        z-index: 999;
         left: 0;
         box-sizing: border-box;
         overflow-x: hidden;
@@ -188,6 +193,7 @@ export default {
               line-height: 32px;
               height: 32px;
               cursor: pointer;
+              padding: 0;
 
               &:hover{
                 background:rgba(243,243,243,1);
@@ -230,6 +236,10 @@ export default {
         // line-height: 200px;
         margin-top: -1px;
         box-sizing: border-box;
+        position: absolute;
+        top: 29px;
+        z-index: 999;
+        left: 0;
 
         .noDataImg{
             vertical-align: middle;

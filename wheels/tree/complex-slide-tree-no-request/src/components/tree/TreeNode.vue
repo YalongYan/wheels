@@ -1,5 +1,5 @@
 <template>
-<div>
+<div class="treeNodeCtn">
     <li class="slide-item" v-for="node in data" :key='node.index'
         :class="{'has-children': node.hasChildren, 'active': node.active}"
         >

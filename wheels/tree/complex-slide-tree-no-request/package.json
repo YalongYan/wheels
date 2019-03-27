@@ -1,7 +1,7 @@
 {
   "name": "yy-org-switch",
   "description": "可下拉选择的数形组件",
-  "version": "1.0.9",
+  "version": "2.0.11",
   "author": "yanyalong",
   "license": "MIT",
   "private": false,

@@ -6,14 +6,13 @@
     <br/>
     <br/>
     <Main
-      @loadData="loadData"
-      @searchData="searchData"
       @select="onSelect"
       @err="errorFunc"
       :name="nameTag"
       :id="idTag"
       :defaultText="defaultText"
       :onlyOneLevel="onlyOneLevel"
+      :noSearch="noSearch"
       />
   </div>
 </template>
@@ -22,7 +21,7 @@
 import Main from './components/Main.vue'
 import axios from 'axios'
 axios.defaults.withCredentials = true
-
+ let t = 0
 export default {
   name: 'app',
   data () {
@@ -37,7 +36,8 @@ export default {
       nameTag: 'name',
       idTag: 'id',
       treeData: [],
-      onlyOneLevel: true
+      onlyOneLevel: false,
+      noSearch:false
     }
   },
   methods:{
@@ -47,7 +47,7 @@ export default {
     onSelect(obj) {
       console.log(obj.name)
     },
-    loadData(parentId) {
+    yyOrgSelectLoadData(parentId) {
       if(!parentId && parentId != 0) {
         parentId = ''
       }
@@ -61,14 +61,24 @@ export default {
         parent_id: parentId
       }
       let url = 'http://web.api.chaoke.com:6062/dept/getDeptList?v=1&qzid=16214&page=1&count=60&breadcrumbs=0&dept_type=0&parent_id=' + parentId
-      return new Promise((resolve, reject) => {
-          axios.get(url).then((res)=> {
-            resolve(res.data.data.dept_list)
+      // let url = 'http://web.api.chaoke.com:6062/dept/getDeptList?v=1&qzid=2984&page=1&count=60&breadcrumbs=0&dept_type=0&parent_id=' + parentId
+      console.log(t)
+      if(t==0) {
+          t=1
+          return new Promise((resolve, reject) => {
+            resolve([{name:'111', id: 0}])
+          })
+      }else {
+        return new Promise((resolve, reject) => {
+              axios.get(url).then((res)=> {
+                resolve(res.data.data.dept_list)
+              })
         })
-      })
+      }
     },
-    searchData(keyword) {
+    yyOrgSelectSearchData(keyword) {
       let url = 'http://web.api.chaoke.com:6062/dept/getDeptList?v=1&qzid=16214&page=1&count=60&breadcrumbs=0&parent_id=0&dept_type=0&keyword=' + keyword
+      // let url = 'http://web.api.chaoke.com:6062/dept/getDeptList?v=1&qzid=2984&page=1&count=60&breadcrumbs=0&parent_id=0&dept_type=0&keyword=' + keyword
       return new Promise((resolve, reject) => {
           axios.get(url).then((res)=> {
             resolve(res.data.data.dept_list)
@@ -81,8 +91,8 @@ export default {
   },
   created () {
     setTimeout(()=>{
-       this.defaultText = 'sdasdad' 
-    },0)
+       this.noSearch = false 
+    },5000)
   }
 }
 </script>
