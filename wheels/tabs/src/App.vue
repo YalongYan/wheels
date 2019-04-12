@@ -1,12 +1,12 @@
 <template>
   <div id="ylTabsContainer">
     <ul class="ctn-ul">
-      <li class="item">11</li>
-      <li class="item">222</li>
-      <li class="item">222</li>
-      <li class="item">222</li>
-      <li class="item">222</li>
-      <li class="item">222</li>
+      <li class="item" v-for="(item, index) in type" :key="index"
+        :class="{active: activeTab === item.value}"
+        @click="changTab(item, index)">
+        {{item.name}}
+      </li>
+      <div v-if="activeTab!== '' " class="activeBorderBar" :style="`transform: translateX(${sliderTrans}px)`"></div>
       <div style="clear:both"></div>
     </ul>
     <component
@@ -23,8 +23,16 @@ export default {
   name: 'app',
   data () {
     return {
-      activeTab: 'carlist',
-      TabsCont: TabsCont
+      activeTab: '',
+      TabsCont: TabsCont,
+      type: [{value: 'carlist', name: '汽车'}, {value: 'foodlist', name: '美食'}, {value: 'personlist', name: '人类'}],
+      sliderTrans: 0
+    }
+  },
+  methods:{
+    changTab(item, index){
+      this.sliderTrans = index * 68
+      this.activeTab = item.value
     }
   },
   created() {
@@ -51,6 +59,18 @@ export default {
       padding: 0 20px;
       text-align: center;
       cursor: pointer;
+    }
+    .active{
+      color: #03A9F4;
+    }
+    .activeBorderBar{
+      height: 2px;
+      background:#03A9F4;
+      width: 24px;
+      position: absolute;
+      top: 42px;
+      left: 30px;
+      transition: all 0.4s;
     }
   }
 }

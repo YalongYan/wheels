@@ -8,4 +8,5 @@ requireComponent.keys().forEach(fileName => {
   const comp = requireComponent(fileName)
   formComps[fileName.replace(/^\.\/(.*)\.\w+$/, '$1').toLowerCase()] = comp.default
 })
+console.log(formComps)
 export default formComps

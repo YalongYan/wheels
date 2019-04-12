@@ -1,10 +1,10 @@
 <template>
     <div id="yylSelect" :class="{'active': isActive}" @click="isActive = !isActive">
-    <!-- <div id="yylSelect" :class="{'active': isActive}"> -->
         <div class="select-header" ref="yylSelectHeader">  
             <input type="text" class="select-input"
                 :placeholder="placeholder"
                 v-model="resultValue"
+                @keyup="inputKeyUp"
                 />
             <span class="iconCtn icon-designer-chevron"></span>
         </div>
@@ -12,12 +12,13 @@
             <div class="popper__arrow"></div>
             <div class="sldie-down-ctn">
                 <ul class="slide-ul">
-                    <li class="slide-li" v-for="(item, index) in selectOptions"
+                    <slot></slot>
+                    <!-- <li class="slide-li" v-for="(item, index) in selectOptions"
                         :key="index"
                         @click="itemClick(item, index)"
                         :class="{selected: selectedIndex === index}">
                         {{item.value}}
-                    </li>
+                    </li> -->
                     <!-- <li class="slide-li selected">撒大大</li> -->
                 </ul>
             </div>
@@ -27,9 +28,10 @@
 
 <script>
 export default {
+    name: 'ElSelect',
     data(){
         return {
-            isActive: false,
+            isActive: true,
             resultValue: this.value,
             placeholder: 'placeholder111',
             selectOptions: [
@@ -41,12 +43,27 @@ export default {
             selectedIndex: ''
         }
     },
-    props:['value'],
+    provide() {
+      return {
+        'select': this
+      };
+    },
+    props: {
+        value: {
+            required: true
+        },
+    },
     methods:{
         itemClick(item, index) {
+            console.log(item)
+            console.log(index)
             this.selectedIndex = index
-            this.resultValue = item.value
-            this.$emit('input', item.value) 
+        },
+        updateModelVaule(v) {
+           this.$emit('input', v)
+        },
+        inputKeyUp() {
+            let value = this.value
         }
     },
     mounted() {
@@ -55,6 +72,11 @@ export default {
             this.isActive = false
             }
         })
+    },
+    watch: {
+      value(v) {
+        this.resultValue = v;
+      }
     }
 }
 </script>
@@ -68,7 +90,7 @@ export default {
     &.active{
         .select-header{
             .select-input{
-                border-color: #409eff;
+            border-color: #409eff;
             }
             .icon-designer-chevron{
                 transform: translateY(-50%) rotate(180deg);
@@ -90,9 +112,7 @@ export default {
     }
     .select-header{
         position: relative;
-
         .select-input{
-            font-size: 14px;
             -webkit-appearance: none;
             background-color: #fff;
             background-image: none;
@@ -101,6 +121,7 @@ export default {
             box-sizing: border-box;
             color: #606266;
             display: inline-block;
+            font-size: inherit;
             height: 40px;
             line-height: 40px;
             outline: none;
@@ -109,6 +130,7 @@ export default {
             width: 100%;
             padding-right: 30px;
             cursor: pointer;
+            font-size: 14px;
         }
         .iconCtn{
             position: absolute;
@@ -177,43 +199,7 @@ export default {
             //     content: '';
             //     display: inline-block;
             // }
-            .slide-ul{
-                overflow: auto;
-                height: 100%;
-                max-height: 274px;
-                max-height: 167px;
-                /*滚动条样式*/
-                &::-webkit-scrollbar {/*滚动条整体样式*/
-                    width: 4px; /*高宽分别对应横竖滚动条的尺寸*/
-                    height: 3px;
-                }
-                &::-webkit-scrollbar-thumb {/*滚动条里面小方块*/
-                    border-radius: 5px;
-                    background: #d8d8d8;
-                }
-
-                .slide-li{
-                    font-size: 14px;
-                    padding: 0 20px;
-                    position: relative;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    color: #606266;
-                    height: 34px;
-                    line-height: 34px;
-                    box-sizing: border-box;
-                    cursor: pointer;
-                    &:hover{
-                        cursor: pointer;
-                        background: #f5f7fa;
-                    }
-                    &.selected{
-                        color: #409eff;
-                        font-weight: bold;
-                    }
-                }
-            }
+            
         }
     }
     
